@@ -4,6 +4,7 @@ import { Header } from './Header';
 import type { NavItem } from './Header';
 import type { SidebarSection } from './Sidebar';
 import { Sidebar } from './Sidebar';
+import { ToastContainer } from '@/components/feedback/ToastContainer';
 
 /**
  * Dashboard layout props.
@@ -35,6 +36,7 @@ export function DashboardLayout({
           <Container>{children}</Container>
         </main>
       </div>
+      <ToastContainer />
     </div>
   );
 }

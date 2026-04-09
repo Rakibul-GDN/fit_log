@@ -22,31 +22,39 @@ export async function GET(request: Request): Promise<NextResponse> {
   const page = pagination.success ? pagination.data.page : 1;
   const pageSize = pagination.success ? pagination.data.pageSize : 20;
 
-  const [routines, totalItems] = await Promise.all([
-    prisma.routine.findMany({
-      where: { userId: session.user.id },
-      orderBy: { updatedAt: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
-      include: {
-        exerciseAssignments: {
-          include: { exercise: { select: { id: true, name: true, category: true } } },
+  try {
+    const [routines, totalItems] = await Promise.all([
+      prisma.routine.findMany({
+        where: { userId: session.user.id },
+        orderBy: { updatedAt: 'desc' },
+        skip: (page - 1) * pageSize,
+        take: pageSize,
+        include: {
+          exerciseAssignments: {
+            include: { exercise: { select: { id: true, name: true, category: true } } },
+          },
         },
-      },
-    }),
-    prisma.routine.count({ where: { userId: session.user.id } }),
-  ]);
+      }),
+      prisma.routine.count({ where: { userId: session.user.id } }),
+    ]);
 
-  return NextResponse.json({
-    success: true,
-    data: routines,
-    pagination: {
-      page,
-      pageSize,
-      totalItems,
-      totalPages: Math.ceil(totalItems / pageSize),
-    },
-  });
+    return NextResponse.json({
+      success: true,
+      data: routines,
+      pagination: {
+        page,
+        pageSize,
+        totalItems,
+        totalPages: Math.ceil(totalItems / pageSize),
+      },
+    });
+  } catch (error) {
+    console.error('[GET /api/routines] Error:', error);
+    return NextResponse.json(
+      { success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch routines.' } },
+      { status: 500 },
+    );
+  }
 }
 
 /** POST: Create a new routine with exercise assignments */

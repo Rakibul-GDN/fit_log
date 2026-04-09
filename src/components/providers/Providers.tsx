@@ -1,12 +1,12 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useState } from 'react';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { SessionProvider } from 'next-auth/react';
 
 /**
- * Providers wrapper — wraps app with React Query client.
- * Additional providers (NextAuth Session, Theme) will be added here.
+ * Providers wrapper — wraps app with React Query client and NextAuth session.
  */
 export function Providers({ children }: { children: ReactNode }): ReactNode {
   const [queryClient] = useState(
@@ -22,6 +22,8 @@ export function Providers({ children }: { children: ReactNode }): ReactNode {
   );
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    </SessionProvider>
   );
 }

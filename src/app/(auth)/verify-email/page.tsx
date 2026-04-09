@@ -3,6 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/feedback/LoadingSpinner';
+import { Button } from '@/components/ui/Button';
 
 /**
  * Email verification page — validates token and shows success/error.
@@ -33,6 +34,8 @@ function VerifyEmailContent(): React.ReactElement {
   const token = searchParams.get('token');
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
   const [message, setMessage] = useState('');
+  const [resendStatus, setResendStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [resendMessage, setResendMessage] = useState('');
 
   const verifyEmail = useCallback(async (t: string): Promise<void> => {
     try {
@@ -58,6 +61,35 @@ function VerifyEmailContent(): React.ReactElement {
     } catch {
       setStatus('error');
       setMessage('An unexpected error occurred.');
+    }
+  }, []);
+
+  const handleResend = useCallback(async (): Promise<void> => {
+    setResendStatus('sending');
+    setResendMessage('');
+    try {
+      const email = sessionStorage.getItem('pendingVerificationEmail');
+      if (!email) {
+        setResendStatus('error');
+        setResendMessage('No email available. Please register again.');
+        return;
+      }
+      const res = await fetch('/api/auth/resend-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email }),
+      });
+      const data = (await res.json()) as { success: boolean; error?: { message?: string } };
+      if (res.ok && data.success) {
+        setResendStatus('sent');
+        setResendMessage('Verification email resent. Check your inbox.');
+      } else {
+        setResendStatus('error');
+        setResendMessage(data.error?.message ?? 'Failed to resend.');
+      }
+    } catch {
+      setResendStatus('error');
+      setResendMessage('An unexpected error occurred.');
     }
   }, []);
 
@@ -112,12 +144,38 @@ function VerifyEmailContent(): React.ReactElement {
               Verification Failed
             </h2>
             <p className='mt-2 text-sm text-default-500'>{message}</p>
-            <a
-              className='mt-6 inline-block rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
-              href='/register'
-            >
-              Back to Registration
-            </a>
+            <div className='mt-4 space-y-3'>
+              <a
+                className='inline-block rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
+                href='/register'
+              >
+                Back to Registration
+              </a>
+              <div className='border-t border-default-200 pt-3'>
+                <p className='mb-2 text-sm text-default-500'>
+                  Didn't receive a verification email?
+                </p>
+                <Button
+                  isLoading={resendStatus === 'sending'}
+                  isDisabled={resendStatus === 'sent'}
+                  onPress={() => void handleResend()}
+                  size='sm'
+                >
+                  Resend Verification Email
+                </Button>
+                {resendMessage && (
+                  <p
+                    className={`mt-1 text-xs ${
+                      resendStatus === 'error'
+                        ? 'text-danger-600'
+                        : 'text-success-600'
+                    }`}
+                  >
+                    {resendMessage}
+                  </p>
+                )}
+              </div>
+            </div>
           </>
         )}
       </div>

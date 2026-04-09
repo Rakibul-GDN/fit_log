@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { ExerciseCard } from '@/components/ui/ExerciseCard';
+import { ExerciseListSkeleton } from '@/components/feedback/ListSkeletons';
 import { ExerciseSearchFilter } from '@/components/forms/ExerciseSearchFilter';
 import { useExercises } from '@/hooks/api/useExercises';
 import Link from 'next/link';
@@ -22,9 +23,12 @@ export default function ExercisesPage(): React.ReactElement {
           <h1 className='text-3xl font-bold'>Exercise Library</h1>
           <p className='mt-1 text-default-500'>Browse exercises or create custom ones</p>
         </div>
-        <Button as={Link} href='/exercises/create'>
+        <Link
+          className='rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+          href='/exercises/create'
+        >
           Add Custom Exercise
-        </Button>
+        </Link>
       </div>
 
       <ExerciseSearchFilter
@@ -34,16 +38,19 @@ export default function ExercisesPage(): React.ReactElement {
         search={search}
       />
 
-      {isLoading && <p className='mt-6 text-default-400'>Loading exercises...</p>}
+      {isLoading && <div className='mt-6'><ExerciseListSkeleton /></div>}
 
       {error && <p className='mt-6 text-danger-600'>Failed to load exercises.</p>}
 
       {data?.data && data.data.length === 0 && (
         <div className='mt-6 rounded-lg border border-dashed border-default-300 p-8 text-center'>
           <p className='text-lg text-default-500'>No exercises found</p>
-          <Button as={Link} className='mt-4' href='/exercises/create'>
+          <Link
+            className='mt-4 inline-block rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+            href='/exercises/create'
+          >
             Create your first custom exercise
-          </Button>
+          </Link>
         </div>
       )}
 

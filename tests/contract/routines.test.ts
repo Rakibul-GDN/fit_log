@@ -3,7 +3,7 @@ import {
   successResponseValidator,
   paginatedResponseValidator,
   errorResponseValidator,
-} from '@/tests/contract/helpers';
+} from './helpers';
 import { z } from 'zod';
 
 describe('Routines API Contract Tests', () => {

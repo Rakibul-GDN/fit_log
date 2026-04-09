@@ -1,6 +1,14 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+let resendInstance: Resend | null = null;
+
+function getResend(): Resend {
+  if (!resendInstance) {
+    resendInstance = new Resend(process.env.RESEND_API_KEY ?? '');
+  }
+  return resendInstance;
+}
+
 const fromEmail = process.env.EMAIL_FROM ?? 'noreply@fitlog.com';
 const appUrl = process.env.NEXTAUTH_URL ?? 'http://localhost:3000';
 
@@ -12,7 +20,7 @@ export async function sendVerificationEmail(
   const verifyUrl = `${appUrl}/verify-email?token=${token}`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: fromEmail,
       to,
       subject: 'Verify your LogFit account',
@@ -38,7 +46,7 @@ export async function sendPasswordResetEmail(
   const resetUrl = `${appUrl}/reset-password?token=${token}`;
 
   try {
-    await resend.emails.send({
+    await getResend().emails.send({
       from: fromEmail,
       to,
       subject: 'Reset your LogFit password',

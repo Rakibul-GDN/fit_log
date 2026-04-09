@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { WorkoutHistoryCard } from '@/components/layout/WorkoutHistoryCard';
+import { WorkoutListSkeleton } from '@/components/feedback/ListSkeletons';
 import { useWorkouts } from '@/hooks/api/useWorkouts';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -19,22 +20,28 @@ export default function WorkoutsPage(): React.ReactElement {
           <p className='mt-1 text-default-500'>View your past workout sessions</p>
         </div>
         <div className='flex gap-2'>
-          <Button as={Link} href='/workouts/log'>
+          <Link
+            className='rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+            href='/workouts/log'
+          >
             Log Workout
-          </Button>
+          </Link>
         </div>
       </div>
 
-      {isLoading && <p className='text-default-400'>Loading workouts...</p>}
+      {isLoading && <WorkoutListSkeleton />}
 
       {error && <p className='text-danger-600'>Failed to load workouts.</p>}
 
       {data?.data && data.data.length === 0 && (
         <div className='rounded-lg border border-dashed border-default-300 p-8 text-center'>
           <p className='text-lg text-default-500'>No workouts logged yet</p>
-          <Button as={Link} className='mt-4' href='/workouts/log'>
+          <Link
+            className='mt-4 inline-block rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+            href='/workouts/log'
+          >
             Log your first workout
-          </Button>
+          </Link>
         </div>
       )}
 

@@ -6,6 +6,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import type { ReactNode } from 'react';
+import { useEffect, useState } from 'react';
 
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;
 
@@ -43,6 +44,9 @@ export function RoutineForm({
   onSubmit,
   isSubmitting,
 }: RoutineFormProps): ReactNode {
+  const [selectedExercise, setSelectedExercise] = useState('');
+  const [selectedDay, setSelectedDay] = useState<typeof DAYS[number]>('MONDAY');
+
   const {
     register,
     handleSubmit,
@@ -60,13 +64,21 @@ export function RoutineForm({
 
   const assignments = watch('assignments');
 
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const addAssignment = (dayOfWeek: (typeof DAYS)[number], exerciseId: string): void => {
+  // Sync defaultValues assignments to form
+  useEffect(() => {
+    if (defaultValues?.assignments && defaultValues.assignments.length > 0) {
+      setValue('assignments', defaultValues.assignments);
+    }
+  }, [defaultValues?.assignments, setValue]);
+
+  const addAssignment = (): void => {
+    if (!selectedExercise) return;
     const current = assignments ?? [];
     setValue('assignments', [
       ...current,
-      { exerciseId, dayOfWeek, defaultSets: 3, defaultReps: 10, defaultWeight: 0, order: current.length },
+      { exerciseId: selectedExercise, dayOfWeek: selectedDay, defaultSets: 3, defaultReps: 10, defaultWeight: 0, order: current.length },
     ]);
+    setSelectedExercise('');
   };
 
   const removeAssignment = (index: number): void => {
@@ -77,8 +89,12 @@ export function RoutineForm({
     );
   };
 
+  const handleFormSubmit = async (data: RoutineFormValues): Promise<void> => {
+    await onSubmit(data);
+  };
+
   return (
-    <form className='space-y-6' onSubmit={handleSubmit(onSubmit)}>
+    <form className='space-y-6' onSubmit={handleSubmit(handleFormSubmit)}>
       <Input label='Routine Name' {...register('name')} />
       {errors.name && <p className='text-sm text-danger-600'>{errors.name.message}</p>}
 
@@ -91,7 +107,7 @@ export function RoutineForm({
             {assignments.map((a, i) => (
               <li className='flex items-center gap-2 rounded bg-default-100 p-2' key={i}>
                 <span className='flex-1 text-sm'>
-                  {exercises.find((e) => e.id === a.exerciseId)?.name ?? 'Unknown'} — {a.dayOfWeek}
+                  {exercises.find((e) => e.id === a.exerciseId)?.name ?? 'Unknown'} — {a.dayOfWeek.charAt(0) + a.dayOfWeek.slice(1).toLowerCase()}
                 </span>
                 <span className='text-xs text-default-500'>
                   {a.defaultSets}×{a.defaultReps} @ {a.defaultWeight}kg
@@ -110,22 +126,42 @@ export function RoutineForm({
           <p className='mt-1 text-sm text-danger-600'>{errors.assignments.message}</p>
         )}
 
-        <div className='mt-3 flex gap-2'>
-          <select className='rounded border p-2 text-sm' onChange={(_e) => {}}>
-            <option value=''>Select exercise</option>
-            {exercises.map((ex) => (
-              <option key={ex.id} value={ex.id}>
-                {ex.name}
-              </option>
-            ))}
-          </select>
-          <select className='rounded border p-2 text-sm'>
-            {DAYS.map((day) => (
-              <option key={day} value={day}>
-                {day}
-              </option>
-            ))}
-          </select>
+        {/* Add exercise section */}
+        <div className='mt-3 space-y-2 rounded border border-default-200 p-3'>
+          <p className='text-sm font-medium'>Add Exercise</p>
+          <div className='flex flex-wrap gap-2'>
+            <select
+              className='flex-1 rounded border border-default-300 bg-transparent p-2 text-sm'
+              value={selectedExercise}
+              onChange={(e) => setSelectedExercise(e.target.value)}
+            >
+              <option value=''>Select exercise</option>
+              {exercises.map((ex) => (
+                <option key={ex.id} value={ex.id}>
+                  {ex.name} ({ex.category.replace(/_/g, ' ')})
+                </option>
+              ))}
+            </select>
+            <select
+              className='w-36 rounded border border-default-300 bg-transparent p-2 text-sm'
+              value={selectedDay}
+              onChange={(e) => setSelectedDay(e.target.value as typeof DAYS[number])}
+            >
+              {DAYS.map((day) => (
+                <option key={day} value={day}>
+                  {day.charAt(0) + day.slice(1).toLowerCase()}
+                </option>
+              ))}
+            </select>
+            <Button
+              type='button'
+              onPress={addAssignment}
+              isDisabled={!selectedExercise}
+              size='sm'
+            >
+              Add
+            </Button>
+          </div>
         </div>
       </div>
 

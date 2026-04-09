@@ -40,9 +40,12 @@ export default function RoutineDetailPage(): React.ReactElement {
           )}
         </div>
         <div className='flex gap-2'>
-          <Button as={Link} href={`/routines/${routineId}/quick-log`}>
+          <Link
+            className='rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+            href={`/routines/${routineId}/quick-log`}
+          >
             Quick Log
-          </Button>
+          </Link>
           <Button color='danger' onPress={handleDelete}>
             Delete
           </Button>

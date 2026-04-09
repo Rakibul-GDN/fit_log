@@ -1,66 +1,104 @@
 'use client';
 
-import { DashboardLayout as DashboardLayoutBase } from '@/components/layout/DashboardLayout';
-import type { SidebarSection } from '@/components/layout/Sidebar';
-import type { NavItem } from '@/components/layout/Header';
+import { useState } from 'react';
+import { usePathname } from 'next/navigation';
+import { AdminPanel } from '@/components/layout/AdminPanel';
+import { signOut } from 'next-auth/react';
+import Link from 'next/link';
 
-/** Icons */
-const IconRoutines = <span>📋</span>;
-const IconWorkouts = <span>🏃</span>;
-const IconExercises = <span>🏋️</span>;
-const IconProgress = <span>📈</span>;
-const IconSettings = <span>⚙️</span>;
-const IconPlanning = <span>📅</span>;
-const IconTracking = <span>📊</span>;
-const IconAccount = <span>👤</span>;
-
-const headerItems: NavItem[] = [
-  { label: 'Routines', href: '/routines', icon: IconRoutines },
-  { label: 'Workouts', href: '/workouts', icon: IconWorkouts },
-  { label: 'Exercises', href: '/exercises', icon: IconExercises },
-  { label: 'Progress', href: '/progress', icon: IconProgress },
-  { label: 'Settings', href: '/settings', icon: IconSettings },
-];
-
-const sidebarSections: SidebarSection[] = [
-  {
-    title: 'Workout Planning',
-    icon: IconPlanning,
-    items: [
-      { label: 'My Routines', href: '/routines', icon: '📋' },
-      { label: 'Exercise Library', href: '/exercises', icon: '🏋️' },
-    ],
+/** Map routes to titles and breadcrumbs */
+const PAGE_META: Record<string, { title: string; breadcrumb: string[]; cta?: React.ReactNode }> = {
+  '/': {
+    title: 'Dashboard',
+    breadcrumb: ['Dashboard', 'Overview'],
+    cta: (
+      <Link
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+        href="/workouts/log"
+      >
+        + Log Workout
+      </Link>
+    ),
   },
-  {
-    title: 'Tracking',
-    icon: IconTracking,
-    items: [
-      { label: 'Workout History', href: '/workouts', icon: '🏃' },
-      { label: 'Progress', href: '/progress', icon: '📈' },
-    ],
+  '/routines': {
+    title: 'My Routines',
+    breadcrumb: ['Dashboard', 'Planning', 'Routines'],
+    cta: (
+      <Link
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+        href="/routines/create"
+      >
+        + New Routine
+      </Link>
+    ),
   },
-  {
-    title: 'Account',
-    icon: IconAccount,
-    items: [
-      { label: 'Settings', href: '/settings', icon: '⚙️' },
-    ],
+  '/exercises': {
+    title: 'Exercise Library',
+    breadcrumb: ['Dashboard', 'Planning', 'Exercises'],
+    cta: (
+      <Link
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+        href="/exercises/create"
+      >
+        + Add Exercise
+      </Link>
+    ),
   },
-];
+  '/workouts': {
+    title: 'Workout History',
+    breadcrumb: ['Dashboard', 'Tracking', 'Workouts'],
+    cta: (
+      <Link
+        className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition hover:bg-primary/90"
+        href="/workouts/log"
+      >
+        + Log Workout
+      </Link>
+    ),
+  },
+  '/progress': {
+    title: 'Progress',
+    breadcrumb: ['Dashboard', 'Tracking', 'Progress'],
+  },
+  '/settings': {
+    title: 'Settings',
+    breadcrumb: ['Dashboard', 'Account', 'Settings'],
+  },
+};
 
-/** Dashboard route group layout — authenticated pages with sidebar navigation. */
+/** Dashboard route group layout — wraps all authenticated pages with polished AdminPanel. */
 export default function DashboardRouteLayout({
   children,
 }: {
   children: React.ReactNode;
 }): React.ReactElement {
+  const pathname = usePathname();
+  const [collapsed, setCollapsed] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  // Determine page meta from pathname
+  const pageMeta = PAGE_META[pathname] ?? {
+    title: pathname.split('/').pop() ?? 'Dashboard',
+    breadcrumb: ['Dashboard', pathname.split('/')[1] ?? ''],
+  };
+
+  const handleSignOut = (): void => {
+    void signOut({ callbackUrl: '/login' });
+  };
+
   return (
-    <DashboardLayoutBase
-      headerItems={headerItems}
-      showSidebar
-      sidebarSections={sidebarSections}
+    <AdminPanel
+      activePath={pathname}
+      title={pageMeta.title}
+      breadcrumb={pageMeta.breadcrumb}
+      collapsed={collapsed}
+      ctaButton={pageMeta.cta}
+      onToggleCollapse={() => setCollapsed((p) => !p)}
+      onMobileMenuOpen={() => setMobileMenuOpen(true)}
+      mobileMenuOpen={mobileMenuOpen}
+      onCloseMobileMenu={() => setMobileMenuOpen(false)}
     >
       {children}
-    </DashboardLayoutBase>
+    </AdminPanel>
   );
 }

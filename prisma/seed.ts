@@ -60,9 +60,12 @@ const defaultExercises: {
 async function main(): Promise<void> {
   console.log('Seeding default exercises...');
 
+  // Use a sentinel UUID for system exercises so the unique constraint works
+  const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
+
   for (const exercise of defaultExercises) {
     await prisma.exercise.upsert({
-      where: { name: exercise.name },
+      where: { name_createdById: { name: exercise.name, createdById: SYSTEM_USER_ID } },
       update: {},
       create: {
         name: exercise.name,
@@ -70,6 +73,7 @@ async function main(): Promise<void> {
         primaryMuscles: exercise.primaryMuscles,
         isSystemExercise: true,
         description: exercise.description ?? null,
+        createdById: SYSTEM_USER_ID,
       },
     });
   }

@@ -37,6 +37,7 @@ export function Skeleton({
       style={{ width, height }}
       aria-busy="true"
       role="status"
+      aria-label="Loading"
     />
   );
 }

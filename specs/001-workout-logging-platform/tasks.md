@@ -322,31 +322,31 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Contract Tests for User Story 5 ⚠️
 
-- [ ] T126 [P] [US5] Contract test for GET `/api/progress` response shape in `tests/contract/progress.test.ts`
-- [ ] T127 [P] [US5] Contract test for GET `/api/progress/measurements` response shape in `tests/contract/progress.test.ts`
-- [ ] T128 [P] [US5] Contract test for POST `/api/progress/measurements` response shape in `tests/contract/progress.test.ts`
+- [x] T126 [P] [US5] Contract test for GET `/api/progress` response shape in `tests/contract/progress.test.ts`
+- [x] T127 [P] [US5] Contract test for GET `/api/progress/measurements` response shape in `tests/contract/progress.test.ts`
+- [x] T128 [P] [US5] Contract test for POST `/api/progress/measurements` response shape in `tests/contract/progress.test.ts`
 
 ### Integration Tests for User Story 5 ⚠️
 
-- [ ] T129 [US5] Integration test for progress data retrieval and calculation in `tests/integration/progress-flow.test.ts`
-- [ ] T130 [US5] Integration test for data isolation (user A cannot access user B's progress/measurements) in `tests/integration/progress-flow.test.ts`
+- [x] T129 [US5] Integration test for progress data retrieval and calculation in `tests/integration/progress-flow.test.ts`
+- [x] T130 [US5] Integration test for data isolation (user A cannot access user B's progress/measurements) in `tests/integration/progress-flow.test.ts`
 
 ### Component Tests for User Story 5 ⚠️
 
-- [ ] T131 [P] [US5] Test ProgressChart displays data points correctly in `tests/components/charts/ProgressChart.test.tsx`
-- [ ] T132 [P] [US5] Test BodyMeasurementForm validates and submits in `tests/components/forms/BodyMeasurementForm.test.tsx`
+- [x] T131 [P] [US5] Test ProgressChart displays data points correctly in `tests/components/charts/ProgressChart.test.tsx`
+- [x] T132 [P] [US5] Test BodyMeasurementForm validates and submits in `tests/components/forms/BodyMeasurementForm.test.tsx`
 
 ### Implementation for User Story 5
 
-- [ ] T133 [P] [US5] Create React Query hooks for progress (useProgress, useMeasurements, useAddMeasurement) in `src/hooks/api/useProgress.ts`
-- [ ] T134 [P] [US5] Create ProgressChart component (line chart with weight + volume series) in `src/components/charts/ProgressChart.tsx`
-- [ ] T135 [P] [US5] Create BodyMeasurementForm component in `src/components/forms/BodyMeasurementForm.tsx`
-- [ ] T136 [P] [US5] Create MeasurementHistoryList component in `src/components/layout/MeasurementHistoryList.tsx`
-- [ ] T137 [US5] Implement GET `/api/progress` route handler (exercise progress data with summary calculations) in `src/app/api/progress/route.ts`
-- [ ] T138 [US5] Implement GET `/api/progress/measurements` route handler in `src/app/api/progress/measurements/route.ts`
-- [ ] T139 [US5] Implement POST `/api/progress/measurements` route handler in `src/app/api/progress/measurements/route.ts`
-- [ ] T140 [US5] Implement DELETE `/api/progress/measurements/[id]` route handler in `src/app/api/progress/measurements/[measurementId]/route.ts`
-- [ ] T141 [US5] Implement progress tracking page (exercise selector, time range, dual-metric chart, body measurements) in `src/app/(dashboard)/progress/page.tsx`
+- [x] T133 [P] [US5] Create React Query hooks for progress (useProgress, useMeasurements, useAddMeasurement) in `src/hooks/api/useProgress.ts`
+- [x] T134 [P] [US5] Create ProgressChart component (line chart with weight + volume series) in `src/components/charts/ProgressChart.tsx`
+- [x] T135 [P] [US5] Create BodyMeasurementForm component in `src/components/forms/BodyMeasurementForm.tsx`
+- [x] T136 [P] [US5] Create MeasurementHistoryList component in `src/components/layout/MeasurementHistoryList.tsx`
+- [x] T137 [US5] Implement GET `/api/progress` route handler (exercise progress data with summary calculations) in `src/app/api/progress/route.ts`
+- [x] T138 [US5] Implement GET `/api/progress/measurements` route handler in `src/app/api/progress/measurements/route.ts`
+- [x] T139 [US5] Implement POST `/api/progress/measurements` route handler in `src/app/api/progress/measurements/route.ts`
+- [x] T140 [US5] Implement DELETE `/api/progress/measurements/[id]` route handler in `src/app/api/progress/measurements/[measurementId]/route.ts`
+- [x] T141 [US5] Implement progress tracking page (exercise selector, time range, dual-metric chart, body measurements) in `src/app/(dashboard)/progress/page.tsx`
 
 **Checkpoint**: User Story 5 complete — users can view progress charts and manage body measurements
 
@@ -360,20 +360,20 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Contract Tests for User Story 6 ⚠️
 
-- [ ] T142 [P] [US6] Contract test for GET `/api/settings` response shape in `tests/contract/settings.test.ts`
-- [ ] T143 [P] [US6] Contract test for PATCH `/api/settings` response shape in `tests/contract/settings.test.ts`
+- [x] T142 [P] [US6] Contract test for GET `/api/settings` response shape in `tests/contract/settings.test.ts`
+- [x] T143 [P] [US6] Contract test for PATCH `/api/settings` response shape in `tests/contract/settings.test.ts`
 
 ### Component Tests for User Story 6 ⚠️
 
-- [ ] T144 [P] [US6] Test SettingsForm validates and updates correctly in `tests/components/forms/SettingsForm.test.tsx`
+- [x] T144 [P] [US6] Test SettingsForm validates and updates correctly in `tests/components/forms/SettingsForm.test.tsx`
 
 ### Implementation for User Story 6
 
-- [ ] T145 [P] [US6] Create React Query hooks for settings (useSettings, useUpdateSettings) in `src/hooks/api/useSettings.ts`
-- [ ] T146 [P] [US6] Create SettingsForm component (name, email, password, unit toggle) in `src/components/forms/SettingsForm.tsx`
-- [ ] T147 [US6] Implement GET `/api/settings` route handler in `src/app/api/settings/route.ts`
-- [ ] T148 [US6] Implement PATCH `/api/settings` route handler in `src/app/api/settings/route.ts`
-- [ ] T149 [US6] Implement settings page in `src/app/(dashboard)/settings/page.tsx`
+- [x] T145 [P] [US6] Create React Query hooks for settings (useSettings, useUpdateSettings) in `src/hooks/api/useSettings.ts`
+- [x] T146 [P] [US6] Create SettingsForm component (name, email, password, unit toggle) in `src/components/forms/SettingsForm.tsx`
+- [x] T147 [US6] Implement GET `/api/settings` route handler in `src/app/api/settings/route.ts`
+- [x] T148 [US6] Implement PATCH `/api/settings` route handler in `src/app/api/settings/route.ts`
+- [x] T149 [US6] Implement settings page in `src/app/(dashboard)/settings/page.tsx`
 
 **Checkpoint**: User Story 6 complete — users can manage account and preferences
 
@@ -383,19 +383,19 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 **Purpose**: Improvements that affect multiple user stories
 
-- [ ] T150 [P] Add toast notifications for all CRUD operations (success/error feedback) using HeroUI toast in `src/components/feedback/ToastContainer.tsx`
-- [ ] T151 [P] Add loading skeletons for all list views (workout history, exercise library, routines, progress) in respective component files
-- [ ] T152 [P] Add empty state components for zero-data scenarios (no routines, no workouts, no progress) in `src/components/feedback/EmptyState.tsx`
-- [ ] T153 [P] Create unit conversion utility functions (metric ↔ imperial) in `src/lib/utils/unitConverter.ts`
-- [ ] T154 Integrate unit conversion into all workout data displays (routines, workouts, progress) across affected components
-- [ ] T155 [P] Add account deletion flow with confirmation + data cleanup in `src/app/(dashboard)/settings/page.tsx`
-- [ ] T156 Implement resend verification email functionality for users who haven't received email in `src/app/(auth)/verify-email/page.tsx`
-- [ ] T157 [P] Add Framer Motion page transitions across all route groups
-- [ ] T158 [P] Add accessibility audit (axe-core) and fix any violations
-- [ ] T159 Run E2E test suite with Playwright across critical user journeys
-- [ ] T160 [P] Performance audit: bundle analysis, LCP optimization, code splitting review
-- [ ] T161 Update README.md with project overview, setup instructions, and architecture diagram
-- [ ] T162 Run `quickstart.md` validation — follow steps end-to-end and fix any issues
+- [x] T150 [P] Add toast notifications for all CRUD operations (success/error feedback) using HeroUI toast in `src/components/feedback/ToastContainer.tsx`
+- [x] T151 [P] Add loading skeletons for all list views (workout history, exercise library, routines, progress) in respective component files
+- [x] T152 [P] Add empty state components for zero-data scenarios (no routines, no workouts, no progress) in `src/components/feedback/EmptyState.tsx`
+- [x] T153 [P] Create unit conversion utility functions (metric ↔ imperial) in `src/lib/utils/unitConverter.ts`
+- [x] T154 Integrate unit conversion into all workout data displays (routines, workouts, progress) across affected components
+- [x] T155 [P] Add account deletion flow with confirmation + data cleanup in `src/app/(dashboard)/settings/page.tsx`
+- [x] T156 Implement resend verification email functionality for users who haven't received email in `src/app/(auth)/verify-email/page.tsx`
+- [x] T157 [P] Add Framer Motion page transitions across all route groups
+- [x] T158 [P] Add accessibility audit (axe-core) and fix any violations
+- [x] T159 Run E2E test suite with Playwright across critical user journeys
+- [x] T160 [P] Performance audit: bundle analysis, LCP optimization, code splitting review
+- [x] T161 Update README.md with project overview, setup instructions, and architecture diagram
+- [x] T162 Run `quickstart.md` validation — follow steps end-to-end and fix any issues
 
 ---
 

@@ -68,6 +68,9 @@ export function RegisterForm(): React.ReactElement {
         return;
       }
 
+      // Store email for resend verification
+      sessionStorage.setItem('pendingVerificationEmail', data.email);
+
       // If email failed to send, show warning but still proceed
       if (!result.data?.emailSent) {
         setServerError(

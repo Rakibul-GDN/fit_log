@@ -223,6 +223,86 @@ fit_log/
 
 **Structure Decision**: Single Next.js monorepo with App Router architecture. Backend API routes co-located with frontend under `src/app/api/`. Data model managed via Prisma schema. Client-side data fetching through React Query custom hooks per API endpoint. Zustand for global state (auth session, settings, UI state). Component-level error boundaries and loading skeletons throughout. Mobile-first responsive design using Tailwind CSS breakpoints.
 
+## Audit Findings & Remediation Plan
+
+> **Date**: 2026-04-09 — Post-implementation audit of all Phase 1-10 tasks.
+> **Method**: Automated agent audit + manual verification of critical paths.
+
+### User Testing Feedback
+
+> Issues reported during manual testing. Each item is logged here before being fixed.
+
+| # | Issue | Status | Reported |
+|---|-------|--------|----------|
+| T1 | **GET `/api/routines` returns 500** — `deletedAt` column in Prisma schema but not in DB. Reverted from schema. **User must restart dev server + run `npx prisma generate`** for Prisma client to pick up the change. | **In Progress** (waiting for server restart) | 2026-04-09 |
+| T2 | **"Create Routine" button does nothing** — `Button as={Link}` not working with HeroUI v3. Replaced all `Button as={Link}` instances with plain `<Link>` tags across routines, workouts, exercises, and routine detail pages (6 occurrences fixed). | **Fixed** | 2026-04-09 |
+| T3 | **Polish design — rebuild dashboard layout** with fixed left sidebar (240px collapsible), top header bar (search, notifications, avatar), KPI stat cards, DataTable component with row hover/click, breadcrumbs, CTA buttons, quick actions grid, mobile-responsive drawer. All using Tailwind + minimal HeroUI. | **Fixed** | 2026-04-09 |
+
+### Critical Bugs (Must Fix Before Production)
+
+| # | Issue | Impact | Files Affected |
+|---|-------|--------|----------------|
+| A1 | **Quick Log workflow broken** — `onSave` is a no-op; workout log is created on `handleStart` (before review), user cannot discard after save | Users cannot complete quick-log flow as designed | `src/app/(dashboard)/routines/[routineId]/quick-log/page.tsx`, `src/components/forms/QuickLogReview.tsx` |
+| A2 | **RoutineForm exercise assignment UI non-functional** — select `onChange` handlers are no-ops; `addAssignment` is defined but never called; users cannot add exercises to routines | Users cannot create routines with exercises | `src/components/forms/RoutineForm.tsx` |
+| A3 | **WorkoutLogForm has no dynamic entry management** — no "Add Exercise" or "Remove Exercise" button; only renders default entries | Users cannot build a workout with multiple exercises | `src/components/forms/WorkoutLogForm.tsx` |
+| A4 | **Forgot Password page missing** — API route exists but no `/forgot-password` UI page; users who navigate there get 404 | Password reset flow broken for direct navigation | Missing: `src/app/(auth)/forgot-password/page.tsx` |
+| A5 | **No SessionProvider** — `Providers.tsx` only has QueryClientProvider; `useSession()` may not work correctly across client navigations | Auth session may be unreliable in client components | `src/components/providers/Providers.tsx` |
+
+### High Priority Issues
+
+| # | Issue | Impact | Files Affected |
+|---|-------|--------|----------------|
+| A6 | **Exercise `@@unique([name])` is global** — prevents users from creating custom exercises with same name as system exercises (e.g., "Bench Press") | Custom exercise creation blocked for common exercise names | `prisma/schema.prisma` (Exercise model) |
+| A7 | **Routine list shows `exerciseCount={0}`** — hardcoded value, never uses actual count from API | Users see "0 exercises assigned" for all routines | `src/app/(dashboard)/routines/page.tsx` |
+| A8 | **Quick Log creates DB record before review** — should create on save, not on start; user cannot truly "discard" | Data integrity: orphaned workout logs on discard | `src/app/(dashboard)/routines/[routineId]/quick-log/page.tsx` |
+| A9 | **No password change endpoint** — settings API doesn't support password updates | Users cannot change password (FR-011, US6) | Missing: `src/app/api/settings/password/route.ts` |
+| A10 | **Soft deletes not implemented** — `deletedAt` exists on User but unused; routines/exercises are hard-deleted | No data recovery possible after deletion | `prisma/schema.prisma`, `src/app/api/routines/route.ts`, settings page |
+
+### Medium Priority Issues (Spec Compliance Gaps)
+
+| # | Issue | Spec vs Implementation |
+|---|-------|----------------------|
+| A11 | Pagination fields mismatch — spec: `{page, limit, total, totalPages, hasNext, hasPrev}` vs impl: `{page, pageSize, totalItems, totalPages}` | `src/lib/api/validators.ts`, all list API routes, `src/types/api.ts` |
+| A12 | Default page size mismatch — spec: default 10, max 50 vs impl: default 20, max 100 | `src/lib/api/validators.ts` |
+| A13 | Error codes mismatch — multiple routes use different error codes than spec (`EMAIL_EXISTS` vs `CONFLICT`, `INVALID_TOKEN` vs `VALIDATION_ERROR`, etc.) | Auth routes, quick-log route |
+| A14 | Register response shape mismatch — spec: `{id, email, name, emailVerified, message}` vs impl: `{userId, email, message, emailSent}` | `src/app/api/auth/register/route.ts` |
+| A15 | Verify email response missing `verified: true` field | `src/app/api/auth/verify-email/route.ts` |
+| A16 | Routine PATCH replaces ALL assignments instead of partial update | `src/app/api/routines/[routineId]/route.ts` |
+| A17 | Workout PATCH replaces ALL entries instead of partial update | `src/app/api/workouts/[workoutId]/route.ts` |
+| A18 | Progress API response shape differs from spec (missing `summary` block, different field names) | `src/app/api/progress/route.ts` |
+| A19 | Body measurements API missing filter params (`measurementType`, `startDate`, `endDate`) | `src/app/api/progress/measurements/route.ts` |
+| A20 | Exercises API missing `includeCustom` query param | `src/app/api/exercises/route.ts` |
+| A21 | Missing `workoutDate` param in Quick Log POST | `src/app/api/routines/[routineId]/quick-log/route.ts` |
+| A22 | No future-date validation for `workoutDate` / `measurementDate` | `src/lib/api/validators.ts` |
+| A23 | Missing API route: `GET/PATCH/DELETE /api/exercises/[exerciseId]` | Custom exercise management incomplete |
+| A24 | Missing API route: `/api/workouts/[workoutId]/entries/` | Individual log entry CRUD |
+
+### Low Priority Issues
+
+| # | Issue | Impact |
+|---|-------|--------|
+| A25 | Axios auth interceptor is a no-op (comment says "token will be injected") | Works via cookies for same-origin but interceptor is dead code |
+| A26 | Multiple `any` type usages with `eslint-disable` comments violate "no `any`" constitution rule | Code quality / type safety |
+| A27 | Multiple `// eslint-disable-next-line` for unused directives (no problems reported) | Code cleanliness |
+| A28 | WorkoutLogForm and RoutineForm use raw `<select>` instead of HeroUI Select | UI consistency |
+| A29 | `measurementDate` required in schema but spec says default to today | Minor UX gap |
+| A30 | All test files in `tests/` have placeholder stubs (`expect(true).toBe(true)`) | TDD constitution not fully met for integration/E2E |
+
+### Recommended Improvements (Not In Original Spec)
+
+| # | Improvement | Reason |
+|---|-------------|--------|
+| I1 | Add `SessionProvider` to Providers wrapper | Enable `useSession()` in client components reliably |
+| I2 | Add optimistic updates to React Query mutations | Better UX: instant feedback without waiting for server |
+| I3 | Add React Query `staleTime`/`gcTime` tuning per resource | Reduce unnecessary refetches |
+| I4 | Add input sanitization for exercise names (trim, normalize whitespace) | Prevent duplicate exercises from whitespace variations |
+| I5 | Add `createdById` to Exercise `@@unique` constraint: `@@unique([name, createdById])` | Allow users to create custom exercises with system exercise names |
+| I6 | Add computed fields to API responses (`exerciseCount`, `entryCount`, `routineName`, `totalVolume`) | Match spec contracts and reduce client-side computation |
+| I7 | Add error boundary around each dashboard page section | Prevent full-page crashes on partial failures |
+| I8 | Add `react-hook-form` `mode: 'onBlur'` validation to all forms | Better UX: validate on blur instead of only on submit |
+| I9 | Add keyboard shortcuts (Ctrl+S to save forms, Escape to close modals) | Power user productivity |
+| I10 | Add `next/image` for any future image assets | Performance and layout shift prevention |
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**

@@ -2,6 +2,7 @@
 
 import { Button } from '@/components/ui/Button';
 import { RoutineCard } from '@/components/ui/RoutineCard';
+import { RoutineListSkeleton } from '@/components/feedback/ListSkeletons';
 import { useRoutines, useDeleteRoutine } from '@/hooks/api/useRoutines';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -25,35 +26,44 @@ export default function RoutinesPage(): React.ReactElement {
           <h1 className='text-3xl font-bold'>My Routines</h1>
           <p className='mt-1 text-default-500'>Create and manage your weekly workout routines</p>
         </div>
-        <Button as={Link} href='/routines/create'>
+        <Link
+          className='rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+          href='/routines/create'
+        >
           Create Routine
-        </Button>
+        </Link>
       </div>
 
-      {isLoading && <p className='text-default-400'>Loading routines...</p>}
+      {isLoading && <RoutineListSkeleton />}
 
       {error && <p className='text-danger-600'>Failed to load routines.</p>}
 
       {data?.data && data.data.length === 0 && (
         <div className='rounded-lg border border-dashed border-default-300 p-8 text-center'>
           <p className='text-lg text-default-500'>No routines yet</p>
-          <Button as={Link} className='mt-4' href='/routines/create'>
+          <Link
+            className='mt-4 inline-block rounded-md bg-primary px-4 py-2 font-medium text-primary-foreground transition hover:bg-primary/90'
+            href='/routines/create'
+          >
             Create your first routine
-          </Button>
+          </Link>
         </div>
       )}
 
       <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
-        {data?.data?.map((routine) => (
-          <RoutineCard
-            key={routine.id}
-            description={routine.description ?? null}
-            exerciseCount={0}
-            id={routine.id}
-            name={routine.name}
-            onDelete={() => void handleDelete(routine.id)}
-          />
-        ))}
+        {data?.data?.map((routine) => {
+          const exerciseCount = (routine as { exerciseAssignments?: unknown[] }).exerciseAssignments?.length ?? 0;
+          return (
+            <RoutineCard
+              key={routine.id}
+              description={routine.description ?? null}
+              exerciseCount={exerciseCount}
+              id={routine.id}
+              name={routine.name}
+              onDelete={() => void handleDelete(routine.id)}
+            />
+          );
+        })}
       </div>
 
       {data?.pagination && data.pagination.totalPages > 1 && (

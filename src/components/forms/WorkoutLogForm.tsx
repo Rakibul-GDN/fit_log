@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import { Button } from '@/components/ui/Button';
 import { Input } from '@/components/ui/Input';
 import { useExercises } from '@/hooks/api/useExercises';
@@ -8,6 +9,7 @@ import type { ReactNode } from 'react';
 /** Workout log entry */
 export interface WorkoutEntry {
   exerciseId: string;
+  exerciseName?: string;
   setsCompleted: number;
   repsPerSet: number[];
   weight: number;
@@ -24,6 +26,8 @@ export interface WorkoutLogFormProps {
   isSubmitting?: boolean;
 }
 
+const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;
+
 /**
  * WorkoutLogForm — manual exercise entry with add/remove exercises.
  */
@@ -38,78 +42,142 @@ export function WorkoutLogForm({
   const { data: exercisesData } = useExercises(1, 200);
   const exercises = exercisesData?.data ?? [];
 
-  const entries = defaultEntries.length > 0 ? defaultEntries : [
-    { exerciseId: '', setsCompleted: 3, repsPerSet: [10, 10, 10], weight: 0, notes: '' },
-  ];
+  const [dayOfWeek, setDayOfWeek] = useState(defaultDayOfWeek);
+  const [workoutDate, setWorkoutDate] = useState(defaultDate);
+  const [notes, setNotes] = useState(defaultNotes);
+  const [entries, setEntries] = useState<WorkoutEntry[]>(
+    defaultEntries.length > 0
+      ? defaultEntries
+      : [{ exerciseId: '', setsCompleted: 3, repsPerSet: [10, 10, 10], weight: 0, notes: '' }],
+  );
+
+  const updateEntry = (index: number, field: keyof WorkoutEntry, value: unknown): void => {
+    setEntries((prev) => {
+      const updated = [...prev];
+      updated[index] = { ...updated[index], [field]: value };
+      return updated;
+    });
+  };
+
+  const addExercise = (): void => {
+    setEntries((prev) => [
+      ...prev,
+      { exerciseId: '', setsCompleted: 3, repsPerSet: [10], weight: 0, notes: '' },
+    ]);
+  };
+
+  const removeExercise = (index: number): void => {
+    setEntries((prev) => prev.filter((_, i) => i !== index));
+  };
 
   const handleSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
-    const form = e.target as HTMLFormElement;
-    const formData = new FormData(form);
-
-    const dayOfWeek = formData.get('dayOfWeek') as string;
-    const workoutDate = formData.get('workoutDate') as string;
-    const notes = formData.get('notes') as string;
-
-    // Gather entries from form
-    const entryCount = parseInt(formData.get('entryCount') as string, 10);
-    const workoutEntries: WorkoutEntry[] = [];
-
-    for (let i = 0; i < entryCount; i++) {
-      const exerciseId = formData.get(`exerciseId-${i}`) as string;
-      if (!exerciseId) continue;
-
-      workoutEntries.push({
-        exerciseId,
-        setsCompleted: parseInt(formData.get(`sets-${i}`) as string, 10) || 3,
-        repsPerSet: (formData.get(`reps-${i}`) as string).split(',').map((r) => parseInt(r.trim(), 10) || 10),
-        weight: parseFloat(formData.get(`weight-${i}`) as string) || 0,
-        notes: (formData.get(`entryNotes-${i}`) as string) || '',
-      });
-    }
-
-    if (workoutEntries.length === 0) return;
-
-    void onSubmit({ dayOfWeek, workoutDate, notes, entries: workoutEntries });
+    const validEntries = entries.filter((entry) => entry.exerciseId);
+    if (validEntries.length === 0) return;
+    void onSubmit({ dayOfWeek, workoutDate, notes, entries: validEntries });
   };
 
   return (
     <form className='space-y-6' onSubmit={handleSubmit}>
-      <input name='entryCount' type='hidden' value={entries.length} />
-
       <div className='grid grid-cols-2 gap-3'>
         <div>
-          <label className='mb-1 block text-sm font-medium'>Day of Week</label>
-          <select className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm' name='dayOfWeek' defaultValue={defaultDayOfWeek}>
-            {['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'].map((day) => (
+          <label className='mb-1 block text-sm font-medium' htmlFor='dayOfWeek'>Day of Week</label>
+          <select
+            id='dayOfWeek'
+            className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
+            value={dayOfWeek}
+            onChange={(e) => setDayOfWeek(e.target.value)}
+          >
+            {DAYS.map((day) => (
               <option key={day} value={day}>{day.charAt(0) + day.slice(1).toLowerCase()}</option>
             ))}
           </select>
         </div>
-        <Input label='Date' name='workoutDate' type='date' defaultValue={defaultDate} />
+        <div>
+          <label className='mb-1 block text-sm font-medium' htmlFor='workoutDate'>Date</label>
+          <input
+            id='workoutDate'
+            className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
+            type='date'
+            value={workoutDate}
+            onChange={(e) => setWorkoutDate(e.target.value)}
+          />
+        </div>
       </div>
 
       <div className='space-y-4'>
+        <div className='flex items-center justify-between'>
+          <h3 className='text-lg font-semibold'>Exercises ({entries.length})</h3>
+          <Button type='button' size='sm' onPress={addExercise}>
+            + Add Exercise
+          </Button>
+        </div>
+
         {entries.map((entry, i) => (
           <div className='rounded-lg border border-default-200 bg-card p-4' key={i}>
-            <div className='mb-3'>
-              <select className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm' defaultValue={entry.exerciseId} name={`exerciseId-${i}`}>
+            <div className='mb-3 flex items-start gap-2'>
+              <span className='mt-2 text-sm font-medium text-default-500'>#{i + 1}</span>
+              <select
+                className='flex-1 rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
+                value={entry.exerciseId}
+                onChange={(e) => {
+                  const ex = exercises.find((ex) => ex.id === e.target.value);
+                  updateEntry(i, 'exerciseId', e.target.value);
+                  if (ex) updateEntry(i, 'exerciseName', ex.name);
+                }}
+              >
                 <option value=''>Select exercise</option>
                 {exercises.map((ex) => (
                   <option key={ex.id} value={ex.id}>{ex.name}</option>
                 ))}
               </select>
+              {entries.length > 1 && (
+                <Button color='danger' size='sm' onPress={() => removeExercise(i)}>
+                  ×
+                </Button>
+              )}
             </div>
             <div className='grid grid-cols-3 gap-3'>
-              <Input label='Sets' name={`sets-${i}`} type='number' defaultValue={entry.setsCompleted} />
-              <Input label='Reps (comma-separated)' name={`reps-${i}`} type='text' defaultValue={entry.repsPerSet.join(', ')} />
-              <Input label='Weight (kg)' name={`weight-${i}`} type='number' defaultValue={entry.weight} />
+              <Input
+                label='Sets'
+                type='number'
+                value={entry.setsCompleted.toString()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEntry(i, 'setsCompleted', parseInt(e.target.value, 10) || 1)}
+              />
+              <div>
+                <label className='mb-1 block text-xs text-default-500'>Reps per set (comma-separated)</label>
+                <input
+                  className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
+                  type='text'
+                  value={entry.repsPerSet.join(', ')}
+                  onChange={(e) => {
+                    const reps = e.target.value.split(',').map((r) => parseInt(r.trim(), 10) || 10);
+                    updateEntry(i, 'repsPerSet', reps);
+                  }}
+                />
+              </div>
+              <Input
+                label='Weight'
+                type='number'
+                value={entry.weight.toString()}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => updateEntry(i, 'weight', parseFloat(e.target.value) || 0)}
+              />
             </div>
           </div>
         ))}
       </div>
 
-      <Input label='Notes (optional)' name='notes' defaultValue={defaultNotes} />
+      <div>
+        <label className='mb-1 block text-sm font-medium' htmlFor='notes'>Notes (optional)</label>
+        <textarea
+          id='notes'
+          className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
+          rows={3}
+          value={notes}
+          onChange={(e) => setNotes(e.target.value)}
+          maxLength={1000}
+        />
+      </div>
 
       <Button className='w-full' isLoading={isSubmitting} type='submit'>
         Save Workout

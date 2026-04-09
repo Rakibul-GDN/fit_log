@@ -127,7 +127,7 @@ model Exercise {
   exerciseAssignments ExerciseAssignment[]
   logEntries         LogEntry[]
 
-  @@unique([name])
+  @@unique([name, createdById])
   @@index([isSystemExercise])
   @@index([createdById])
 }

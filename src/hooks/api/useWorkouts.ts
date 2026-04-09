@@ -1,5 +1,6 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import apiClient from '@/lib/api/client';
+import { useToast } from '@/hooks/ui/useToast';
 import type { WorkoutLog } from '@/types/entities';
 import type { PaginatedResponse, SuccessResponse } from '@/types/api';
 
@@ -64,30 +65,43 @@ export function useWorkout(workoutId: string) {
 /** Mutation hook: Create workout */
 export function useCreateWorkout() {
   const queryClient = useQueryClient();
+  const toast = useToast();
   return useMutation({
     mutationFn: createWorkout,
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['workouts'] }); },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      toast.success('Workout logged successfully.');
+    },
+    onError: () => { toast.error('Failed to log workout.'); },
   });
 }
 
 /** Mutation hook: Update workout */
 export function useUpdateWorkout() {
   const queryClient = useQueryClient();
+  const toast = useToast();
   return useMutation({
     mutationFn: ({ workoutId, input }: { workoutId: string; input: { dayOfWeek?: string; workoutDate?: string; notes?: string; entries?: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weight: number; notes?: string }[] } }) =>
       updateWorkout(workoutId, input),
     onSuccess: (_, { workoutId }) => {
       void queryClient.invalidateQueries({ queryKey: ['workouts'] });
       void queryClient.invalidateQueries({ queryKey: ['workout', workoutId] });
+      toast.success('Workout updated successfully.');
     },
+    onError: () => { toast.error('Failed to update workout.'); },
   });
 }
 
 /** Mutation hook: Delete workout */
 export function useDeleteWorkout() {
   const queryClient = useQueryClient();
+  const toast = useToast();
   return useMutation({
     mutationFn: deleteWorkout,
-    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['workouts'] }); },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ['workouts'] });
+      toast.success('Workout deleted successfully.');
+    },
+    onError: () => { toast.error('Failed to delete workout.'); },
   });
 }

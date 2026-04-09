@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   successResponseValidator,
   errorResponseValidator,
-} from '@/tests/contract/helpers';
+} from './helpers';
 import { z } from 'zod';
 
 describe('Quick Log API Contract Tests', () => {
