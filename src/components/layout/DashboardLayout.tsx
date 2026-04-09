@@ -23,15 +23,15 @@ export function DashboardLayout({
   headerItems,
   sidebarSections,
   showSidebar = true,
-}: DashboardLayoutProps) {
+}: DashboardLayoutProps): ReactNode {
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className='flex min-h-screen flex-col'>
       <Header navItems={headerItems} />
-      <div className="flex flex-1">
+      <div className='flex flex-1'>
         {showSidebar && sidebarSections && (
           <Sidebar sections={sidebarSections} />
         )}
-        <main className="flex-1">
+        <main className='flex-1'>
           <Container>{children}</Container>
         </main>
       </div>

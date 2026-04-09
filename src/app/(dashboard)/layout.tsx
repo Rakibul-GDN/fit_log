@@ -1,36 +1,49 @@
 'use client';
 
-import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { DashboardLayout as DashboardLayoutBase } from '@/components/layout/DashboardLayout';
 import type { SidebarSection } from '@/components/layout/Sidebar';
 import type { NavItem } from '@/components/layout/Header';
 
+/** Icons */
+const IconRoutines = <span>📋</span>;
+const IconWorkouts = <span>🏃</span>;
+const IconExercises = <span>🏋️</span>;
+const IconProgress = <span>📈</span>;
+const IconSettings = <span>⚙️</span>;
+const IconPlanning = <span>📅</span>;
+const IconTracking = <span>📊</span>;
+const IconAccount = <span>👤</span>;
+
 const headerItems: NavItem[] = [
-  { label: 'Routines', href: '/routines' },
-  { label: 'Workouts', href: '/workouts' },
-  { label: 'Exercises', href: '/exercises' },
-  { label: 'Progress', href: '/progress' },
-  { label: 'Settings', href: '/settings' },
+  { label: 'Routines', href: '/routines', icon: IconRoutines },
+  { label: 'Workouts', href: '/workouts', icon: IconWorkouts },
+  { label: 'Exercises', href: '/exercises', icon: IconExercises },
+  { label: 'Progress', href: '/progress', icon: IconProgress },
+  { label: 'Settings', href: '/settings', icon: IconSettings },
 ];
 
 const sidebarSections: SidebarSection[] = [
   {
     title: 'Workout Planning',
+    icon: IconPlanning,
     items: [
-      { label: 'My Routines', href: '/routines' },
-      { label: 'Exercise Library', href: '/exercises' },
+      { label: 'My Routines', href: '/routines', icon: '📋' },
+      { label: 'Exercise Library', href: '/exercises', icon: '🏋️' },
     ],
   },
   {
     title: 'Tracking',
+    icon: IconTracking,
     items: [
-      { label: 'Workout History', href: '/workouts' },
-      { label: 'Progress', href: '/progress' },
+      { label: 'Workout History', href: '/workouts', icon: '🏃' },
+      { label: 'Progress', href: '/progress', icon: '📈' },
     ],
   },
   {
     title: 'Account',
+    icon: IconAccount,
     items: [
-      { label: 'Settings', href: '/settings' },
+      { label: 'Settings', href: '/settings', icon: '⚙️' },
     ],
   },
 ];
@@ -42,12 +55,12 @@ export default function DashboardRouteLayout({
   children: React.ReactNode;
 }): React.ReactElement {
   return (
-    <DashboardLayout
+    <DashboardLayoutBase
       headerItems={headerItems}
       showSidebar
       sidebarSections={sidebarSections}
     >
       {children}
-    </DashboardLayout>
+    </DashboardLayoutBase>
   );
 }

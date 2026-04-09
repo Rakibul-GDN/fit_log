@@ -86,3 +86,21 @@ export function useDeleteRoutine() {
     onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['routines'] }); },
   });
 }
+
+/** Quick log mutation — copy routine day to workout log */
+async function quickLog(routineId: string, dayOfWeek: string) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+  const { data } = await apiClient.post(`/routines/${routineId}/quick-log`, { dayOfWeek });
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+  return data;
+}
+
+/** Mutation hook: Quick log from routine */
+export function useQuickLog() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ routineId, dayOfWeek }: { routineId: string; dayOfWeek: string }) =>
+      quickLog(routineId, dayOfWeek),
+    onSuccess: () => { void queryClient.invalidateQueries({ queryKey: ['routines'] }); },
+  });
+}
