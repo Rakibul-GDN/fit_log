@@ -152,7 +152,12 @@ Next.js App Router monorepo with co-located frontend and backend:
 - [x] T062 [US1] Implement dashboard home page (protected, displays welcome + quick actions) in `src/app/(dashboard)/page.tsx`
 - [x] T164 [US1] Enforce email verification in login — update NextAuth `authorize` to reject unverified users and update `src/middleware.ts` to redirect unverified users to `/verify-email`
 - [x] T165 [US1] Surface email send failures in registration response — if `sendVerificationEmail` fails, return error to user instead of silently succeeding in `src/app/api/auth/register/route.ts`
-- [ ] T166 [US1] Add sign-out button to dashboard header — implement `signOut()` from next-auth/react in `src/components/layout/Header.tsx` with redirect to `/login`
+- [x] T166 [US1] Add sign-out button to dashboard header — implement `signOut()` from next-auth/react in `src/components/layout/Header.tsx` with redirect to `/login`
+- [x] T167 [US1] Redirect root URL `/` to dashboard for authenticated users — removed duplicate `src/app/page.tsx`; `(dashboard)/page.tsx` now serves `/` with full layout, middleware redirects unauthenticated to `/login`
+- [x] T168 [US1] Fix 401 error on `/api/routines` for logged-in users — moved NextAuth config to shared `src/lib/services/auth.ts` with exported `auth` helper; route handler imports from shared config so session resolves correctly
+- [x] T169 [Polish] Improve sidebar and topbar UI — refined sidebar with collapsible sections + active route highlighting + icons, improved topbar with user avatar dropdown menu + sign-out + better spacing
+- [x] T170 [US2] Fix "Create Routine" button — added `src/app/(dashboard)/routines/create/page.tsx` with full form, exercise picker, day selector, and `useCreateRoutine` mutation handler
+- [x] T171 [US4] Fix "Add Custom Exercise" — improved error handling to surface API errors (401/validation), added redirect to `/exercises` on success in `src/app/(dashboard)/exercises/create/page.tsx`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional — users can register, verify email, log in, reset password, and access protected dashboard
 
@@ -208,28 +213,28 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Contract Tests for User Story 4 ⚠️
 
-- [ ] T083 [P] [US4] Contract test for GET `/api/exercises` paginated response shape in `tests/contract/exercises.test.ts`
-- [ ] T084 [P] [US4] Contract test for POST `/api/exercises` response shape in `tests/contract/exercises.test.ts`
+- [x] T083 [P] [US4] Contract test for GET `/api/exercises` paginated response shape in `tests/contract/exercises.test.ts`
+- [x] T084 [P] [US4] Contract test for POST `/api/exercises` response shape in `tests/contract/exercises.test.ts`
 
 ### Integration Tests for User Story 4 ⚠️
 
-- [ ] T085 [US4] Integration test for exercise browsing + custom exercise creation in `tests/integration/exercise-flow.test.ts`
-- [ ] T086 [US4] Integration test for data isolation (user A cannot access user B's custom exercises) in `tests/integration/exercise-flow.test.ts`
+- [x] T085 [US4] Integration test for exercise browsing + custom exercise creation in `tests/integration/exercise-flow.test.ts`
+- [x] T086 [US4] Integration test for data isolation (user A cannot access user B's custom exercises) in `tests/integration/exercise-flow.test.ts`
 
 ### Component Tests for User Story 4 ⚠️
 
-- [ ] T087 [P] [US4] Test ExerciseCard displays exercise info correctly in `tests/components/ui/ExerciseCard.test.tsx`
-- [ ] T088 [P] [US4] Test ExerciseSearchFilter component works in `tests/components/forms/ExerciseSearch.test.tsx`
+- [x] T087 [P] [US4] Test ExerciseCard displays exercise info correctly in `tests/components/ui/ExerciseComponents.test.tsx`
+- [x] T088 [P] [US4] Test ExerciseSearchFilter component works in `tests/components/ui/ExerciseComponents.test.tsx`
 
 ### Implementation for User Story 4
 
-- [ ] T089 [P] [US4] Create React Query hooks for exercises (useExercises, useCreateExercise) in `src/hooks/api/useExercises.ts`
-- [ ] T090 [P] [US4] Create ExerciseCard component in `src/components/ui/ExerciseCard.tsx`
-- [ ] T091 [P] [US4] Create ExerciseSearchFilter component (search input, category dropdown) in `src/components/forms/ExerciseSearchFilter.tsx`
-- [ ] T092 [US4] Implement GET `/api/exercises` route handler (paginated, search, category filter, include custom) in `src/app/api/exercises/route.ts`
-- [ ] T093 [US4] Implement POST `/api/exercises` route handler (create user-custom exercise) in `src/app/api/exercises/route.ts`
-- [ ] T094 [US4] Implement exercise library page (browse, search, create custom) in `src/app/(dashboard)/exercises/page.tsx`
-- [ ] T095 [US4] Implement create custom exercise form page in `src/app/(dashboard)/exercises/create/page.tsx`
+- [x] T089 [P] [US4] Create React Query hooks for exercises (useExercises, useCreateExercise) in `src/hooks/api/useExercises.ts`
+- [x] T090 [P] [US4] Create ExerciseCard component in `src/components/ui/ExerciseCard.tsx`
+- [x] T091 [P] [US4] Create ExerciseSearchFilter component (search input, category dropdown) in `src/components/forms/ExerciseSearchFilter.tsx`
+- [x] T092 [US4] Implement GET `/api/exercises` route handler (paginated, search, category filter, include custom) in `src/app/api/exercises/route.ts`
+- [x] T093 [US4] Implement POST `/api/exercises` route handler (create user-custom exercise) in `src/app/api/exercises/route.ts`
+- [x] T094 [US4] Implement exercise library page (browse, search, create custom) in `src/app/(dashboard)/exercises/page.tsx`
+- [x] T095 [US4] Implement create custom exercise form page in `src/app/(dashboard)/exercises/create/page.tsx`
 
 **Checkpoint**: User Story 4 complete — users can browse default exercises and create personal exercises
 
@@ -243,23 +248,23 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Contract Tests for User Story 7 ⚠️
 
-- [ ] T096 [P] [US7] Contract test for POST `/api/routines/[id]/quick-log` response shape in `tests/contract/routines.test.ts`
+- [x] T096 [P] [US7] Contract test for POST `/api/routines/[id]/quick-log` response shape in `tests/contract/quick-log.test.ts`
 
 ### Integration Tests for User Story 7 ⚠️
 
-- [ ] T097 [US7] Integration test for quick-log flow (copy → edit → save) in `tests/integration/workout-logging.test.ts`
-- [ ] T098 [US7] Integration test for discard-flow behavior (discarded log does not persist) in `tests/integration/workout-logging.test.ts`
+- [x] T097 [US7] Integration test for quick-log flow (copy → edit → save) in `tests/integration/quick-log-flow.test.ts`
+- [x] T098 [US7] Integration test for discard-flow behavior (discarded log does not persist) in `tests/integration/quick-log-flow.test.ts`
 
 ### Component Tests for User Story 7 ⚠️
 
-- [ ] T099 [P] [US7] Test QuickLogReview displays pre-filled exercises with editable fields in `tests/components/forms/QuickLogReview.test.tsx`
+- [x] T099 [P] [US7] Test QuickLogReview displays pre-filled exercises with editable fields in `tests/components/forms/QuickLogReview.test.tsx`
 
 ### Implementation for User Story 7
 
-- [ ] T100 [P] [US7] Create React Query hook for quick-log (useQuickLog) in `src/hooks/api/useRoutines.ts` (append)
-- [ ] T101 [P] [US7] Create QuickLogReview component (pre-filled exercise list with editable sets/reps/weight, add/remove exercise buttons) in `src/components/forms/QuickLogReview.tsx`
-- [ ] T102 [US7] Implement POST `/api/routines/[routineId]/quick-log` route handler (copy exercises from routine day, pre-fill defaults, create workout log) in `src/app/api/routines/[routineId]/quick-log/route.ts`
-- [ ] T103 [US7] Implement quick-log page (routine selector, day selector, review/edit pre-filled exercises, save/discard actions) in `src/app/(dashboard)/routines/[routineId]/quick-log/page.tsx`
+- [x] T100 [P] [US7] Create React Query hook for quick-log (useQuickLog) in `src/hooks/api/useRoutines.ts` (append)
+- [x] T101 [P] [US7] Create QuickLogReview component (pre-filled exercise list with editable sets/reps/weight, add/remove exercise buttons) in `src/components/forms/QuickLogReview.tsx`
+- [x] T102 [US7] Implement POST `/api/routines/[routineId]/quick-log` route handler (copy exercises from routine day, pre-fill defaults, create workout log) in `src/app/api/routines/[routineId]/quick-log/route.ts`
+- [x] T103 [US7] Implement quick-log page (routine selector, day selector, review/edit pre-filled exercises, save/discard actions) in `src/app/(dashboard)/routines/[routineId]/quick-log/page.tsx`
 
 **Checkpoint**: User Story 7 complete — users can quick-log from routines with pre-filled data
 
@@ -273,37 +278,37 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Contract Tests for User Story 3 ⚠️
 
-- [ ] T104 [P] [US3] Contract test for GET `/api/workouts` paginated response shape in `tests/contract/workouts.test.ts`
-- [ ] T105 [P] [US3] Contract test for POST `/api/workouts` response shape in `tests/contract/workouts.test.ts`
-- [ ] T106 [P] [US3] Contract test for GET `/api/workouts/[id]` response shape in `tests/contract/workouts.test.ts`
-- [ ] T107 [P] [US3] Contract test for PATCH `/api/workouts/[id]` response shape in `tests/contract/workouts.test.ts`
-- [ ] T108 [P] [US3] Contract test for DELETE `/api/workouts/[id]` response shape in `tests/contract/workouts.test.ts`
+- [x] T104 [P] [US3] Contract test for GET `/api/workouts` paginated response shape in `tests/contract/workouts.test.ts`
+- [x] T105 [P] [US3] Contract test for POST `/api/workouts` response shape in `tests/contract/workouts.test.ts`
+- [x] T106 [P] [US3] Contract test for GET `/api/workouts/[id]` response shape in `tests/contract/workouts.test.ts`
+- [x] T107 [P] [US3] Contract test for PATCH `/api/workouts/[id]` response shape in `tests/contract/workouts.test.ts`
+- [x] T108 [P] [US3] Contract test for DELETE `/api/workouts/[id]` response shape in `tests/contract/workouts.test.ts`
 
 ### Integration Tests for User Story 3 ⚠️
 
-- [ ] T109 [US3] Integration test for manual workout logging flow in `tests/integration/workout-logging.test.ts`
-- [ ] T110 [US3] Integration test for workout history pagination and filtering in `tests/integration/workout-logging.test.ts`
-- [ ] T111 [US3] Integration test for data isolation (user A cannot access user B's workouts) in `tests/integration/workout-logging.test.ts`
+- [x] T109 [US3] Integration test for manual workout logging flow in `tests/integration/workout-logging.test.ts`
+- [x] T110 [US3] Integration test for workout history pagination and filtering in `tests/integration/workout-logging.test.ts`
+- [x] T111 [US3] Integration test for data isolation (user A cannot access user B's workouts) in `tests/integration/workout-logging.test.ts`
 
 ### Component Tests for User Story 3 ⚠️
 
-- [ ] T112 [P] [US3] Test WorkoutLogForm allows manual exercise entry in `tests/components/forms/WorkoutLogForm.test.tsx`
-- [ ] T113 [P] [US3] Test WorkoutHistoryCard displays session summary in `tests/components/layout/WorkoutHistoryCard.test.tsx`
+- [x] T112 [P] [US3] Test WorkoutLogForm allows manual exercise entry in `tests/components/forms/WorkoutComponents.test.tsx`
+- [x] T113 [P] [US3] Test WorkoutHistoryCard displays session summary in `tests/components/forms/WorkoutComponents.test.tsx`
 
 ### Implementation for User Story 3
 
-- [ ] T114 [P] [US3] Create React Query hooks for workouts (useWorkouts, useWorkout, useCreateWorkout, useUpdateWorkout, useDeleteWorkout) in `src/hooks/api/useWorkouts.ts`
-- [ ] T115 [P] [US3] Create WorkoutLogForm component (manual exercise entry, add/remove exercises, save) in `src/components/forms/WorkoutLogForm.tsx`
-- [ ] T116 [P] [US3] Create WorkoutHistoryCard component in `src/components/layout/WorkoutHistoryCard.tsx`
-- [ ] T117 [P] [US3] Create WorkoutDetailPage component in `src/components/layout/WorkoutDetailPage.tsx`
-- [ ] T118 [US3] Implement GET `/api/workouts` route handler (paginated list with date filter) in `src/app/api/workouts/route.ts`
-- [ ] T119 [US3] Implement POST `/api/workouts` route handler (manual workout log creation) in `src/app/api/workouts/route.ts`
-- [ ] T120 [US3] Implement GET `/api/workouts/[workoutId]` route handler (detail with entries) in `src/app/api/workouts/[workoutId]/route.ts`
-- [ ] T121 [US3] Implement PATCH `/api/workouts/[workoutId]` route handler (update workout + entries) in `src/app/api/workouts/[workoutId]/route.ts`
-- [ ] T122 [US3] Implement DELETE `/api/workouts/[workoutId]` route handler (cascade delete entries) in `src/app/api/workouts/[workoutId]/route.ts`
-- [ ] T123 [US3] Implement workout history page (list, filter by date, pagination) in `src/app/(dashboard)/workouts/page.tsx`
-- [ ] T124 [US3] Implement workout detail page (full session view) in `src/app/(dashboard)/workouts/[workoutId]/page.tsx`
-- [ ] T125 [US3] Implement manual workout logging page in `src/app/(dashboard)/workouts/log/page.tsx`
+- [x] T114 [P] [US3] Create React Query hooks for workouts (useWorkouts, useWorkout, useCreateWorkout, useUpdateWorkout, useDeleteWorkout) in `src/hooks/api/useWorkouts.ts`
+- [x] T115 [P] [US3] Create WorkoutLogForm component (manual exercise entry, add/remove exercises, save) in `src/components/forms/WorkoutLogForm.tsx`
+- [x] T116 [P] [US3] Create WorkoutHistoryCard component in `src/components/layout/WorkoutHistoryCard.tsx`
+- [x] T117 [P] [US3] Create WorkoutDetailPage component in `src/app/(dashboard)/workouts/[workoutId]/page.tsx`
+- [x] T118 [US3] Implement GET `/api/workouts` route handler (paginated list with date filter) in `src/app/api/workouts/route.ts`
+- [x] T119 [US3] Implement POST `/api/workouts` route handler (manual workout log creation) in `src/app/api/workouts/route.ts`
+- [x] T120 [US3] Implement GET `/api/workouts/[workoutId]` route handler (detail with entries) in `src/app/api/workouts/[workoutId]/route.ts`
+- [x] T121 [US3] Implement PATCH `/api/workouts/[workoutId]` route handler (update workout + entries) in `src/app/api/workouts/[workoutId]/route.ts`
+- [x] T122 [US3] Implement DELETE `/api/workouts/[workoutId]` route handler (cascade delete entries) in `src/app/api/workouts/[workoutId]/route.ts`
+- [x] T123 [US3] Implement workout history page (list, filter by date, pagination) in `src/app/(dashboard)/workouts/page.tsx`
+- [x] T124 [US3] Implement workout detail page (full session view) in `src/app/(dashboard)/workouts/[workoutId]/page.tsx`
+- [x] T125 [US3] Implement manual workout logging page in `src/app/(dashboard)/workouts/log/page.tsx`
 
 **Checkpoint**: User Story 3 complete — users can manually log workouts and view history
 
