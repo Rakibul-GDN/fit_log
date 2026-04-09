@@ -39,6 +39,7 @@ Next.js App Router monorepo with co-located frontend and backend:
 - [x] T003 [P] Configure Prettier with single quotes, trailing commas, 100 char wrap in `.prettierrc`
 - [x] T004 [P] Configure `tsconfig.json` with `strict: true`, path aliases (`@/*` → `src/*`)
 - [x] T005 Install and configure HeroUI v3: `npm i @heroui/react framer-motion` with Tailwind plugin setup
+- [x] T163 [P] Configure HeroUI v3 Tailwind plugin in `tailwind.config.ts` and update `src/app/globals.css` with HeroUI theme imports — fixes current bland UI rendering
 - [x] T006 [P] Install and configure Vitest: `npm i -D vitest @testing-library/react @testing-library/jest-dom jsdom`
 - [x] T007 [P] Install and configure Playwright: `npm i -D @playwright/test`
 - [x] T008 [P] Install Prisma ORM: `npm i -D prisma @prisma/client && npx prisma init`
@@ -59,52 +60,52 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Database Layer
 
-- [ ] T015 [P] Define auth entities in Prisma schema (User, VerificationToken) in `prisma/schema.prisma`
-- [ ] T016 [P] Define workout entities in Prisma schema (Routine, Exercise, ExerciseAssignment, WorkoutLog, LogEntry, BodyMeasurement) in `prisma/schema.prisma`
-- [ ] T017 Merge entity definitions and run initial migration: `npx prisma migrate dev --name init` in `prisma/schema.prisma`
-- [ ] T018 [P] Create Prisma seed script with 30-50 default exercises in `prisma/seed.ts`
-- [ ] T019 [P] Configure Prisma adapter with NextAuth v5 in `src/app/api/auth/[...nextauth]/route.ts`
+- [x] T015 [P] Define auth entities in Prisma schema (User, VerificationToken) in `prisma/schema.prisma`
+- [x] T016 [P] Define workout entities in Prisma schema (Routine, Exercise, ExerciseAssignment, WorkoutLog, LogEntry, BodyMeasurement) in `prisma/schema.prisma`
+- [x] T017 Merge entity definitions and run initial migration: `npx prisma migrate dev --name init` in `prisma/schema.prisma`
+- [x] T018 [P] Create Prisma seed script with 30-50 default exercises in `prisma/seed.ts`
+- [x] T019 [P] Configure Prisma adapter with NextAuth v5 in `src/app/api/auth/[...nextauth]/route.ts`
 
 ### Type Definitions
 
-- [ ] T020 [P] Define API response contract types (SuccessResponse, PaginatedResponse, ErrorResponse) in `src/types/api.ts`
-- [ ] T021 [P] Define domain entity types (User, Routine, Exercise, WorkoutLog, LogEntry, BodyMeasurement) in `src/types/entities.ts`
-- [ ] T022 [P] Define form validation types (RegisterForm, LoginForm, RoutineForm, WorkoutForm) in `src/types/forms.ts`
+- [x] T020 [P] Define API response contract types (SuccessResponse, PaginatedResponse, ErrorResponse) in `src/types/api.ts`
+- [x] T021 [P] Define domain entity types (User, Routine, Exercise, WorkoutLog, LogEntry, BodyMeasurement) in `src/types/entities.ts`
+- [x] T022 [P] Define form validation types (RegisterForm, LoginForm, RoutineForm, WorkoutForm) in `src/types/forms.ts`
 
 ### API Client Infrastructure
 
-- [ ] T023 Create Axios instance with interceptors (auth header injection, error transformation, toast triggers) in `src/lib/api/client.ts`
-- [ ] T024 [P] Create API response transformer utilities (envelope parsing, pagination metadata) in `src/lib/api/transformers.ts`
-- [ ] T025 Create Zod validation schemas for all API request/response bodies in `src/lib/api/validators.ts`
+- [x] T023 Create Axios instance with interceptors (auth header injection, error transformation, toast triggers) in `src/lib/api/client.ts`
+- [x] T024 [P] Create API response transformer utilities (envelope parsing, pagination metadata) in `src/lib/api/transformers.ts`
+- [x] T025 Create Zod validation schemas for all API request/response bodies in `src/lib/api/validators.ts`
 
 ### Authentication Infrastructure
 
-- [ ] T026 Configure NextAuth v5 credentials provider with session strategy in `src/app/api/auth/[...nextauth]/route.ts`
-- [ ] T027 Create Next.js middleware for route protection (auth guard, email verification check, redirect logic) in `src/middleware.ts`
-- [ ] T028 [P] Implement email verification token generation service in `src/lib/services/email-verification.ts`
-- [ ] T029 [P] Implement Resend email sending service (verification template, password reset template) in `src/lib/services/email-sender.ts`
-- [ ] T030 Create auth-related Zustand store (session state, user info) in `src/store/authStore.ts`
+- [x] T026 Configure NextAuth v5 credentials provider with session strategy in `src/app/api/auth/[...nextauth]/route.ts`
+- [x] T027 Create Next.js middleware for route protection (auth guard, email verification check, redirect logic) in `src/middleware.ts`
+- [x] T028 [P] Implement email verification token generation service in `src/lib/services/email-verification.ts`
+- [x] T029 [P] Implement Resend email sending service (verification template, password reset template) in `src/lib/services/email-sender.ts`
+- [x] T030 Create auth-related Zustand store (session state, user info) in `src/store/authStore.ts`
 
 ### UI Foundation
 
-- [ ] T031 [P] Create Button component wrapping HeroUI in `src/components/ui/Button.tsx`
-- [ ] T032 [P] Create Input component wrapping HeroUI in `src/components/ui/Input.tsx`
-- [ ] T033 [P] Create Card component wrapping HeroUI in `src/components/ui/Card.tsx`
-- [ ] T034 [P] Create Modal component wrapping HeroUI in `src/components/ui/Modal.tsx`
-- [ ] T035 [P] Create Toast component wrapping HeroUI in `src/components/ui/Toast.tsx`
-- [ ] T036 [P] Create layout components (Header, Sidebar, Container, DashboardLayout) in `src/components/layout/`
-- [ ] T037 [P] Create feedback components (Skeleton loaders, ErrorBoundary wrapper, LoadingSpinner, EmptyState) in `src/components/feedback/`
-- [ ] T038 Create Zustand UI store (sidebar state, modal state, toast queue) in `src/store/uiStore.ts`
-- [ ] T039 Create Zustand settings store (preferred units, display preferences) in `src/store/settingsStore.ts`
+- [x] T031 [P] Create Button component wrapping HeroUI in `src/components/ui/Button.tsx`
+- [x] T032 [P] Create Input component wrapping HeroUI in `src/components/ui/Input.tsx`
+- [x] T033 [P] Create Card component wrapping HeroUI in `src/components/ui/Card.tsx`
+- [x] T034 [P] Create Modal component wrapping HeroUI in `src/components/ui/Modal.tsx`
+- [x] T035 [P] Create Toast component wrapping HeroUI in `src/components/ui/Toast.tsx`
+- [x] T036 [P] Create layout components (Header, Sidebar, Container, DashboardLayout) in `src/components/layout/`
+- [x] T037 [P] Create feedback components (Skeleton loaders, ErrorBoundary wrapper, LoadingSpinner, EmptyState) in `src/components/feedback/`
+- [x] T038 Create Zustand UI store (sidebar state, modal state, toast queue) in `src/store/uiStore.ts`
+- [x] T039 Create Zustand settings store (preferred units, display preferences) in `src/store/settingsStore.ts`
 
 ### Framer Motion Setup
 
-- [ ] T040 [P] Create page transition wrapper component (fade + slide animation) in `src/components/layout/PageTransition.tsx`
-- [ ] T041 [P] Create animated list item component (staggered fade-in) in `src/components/ui/AnimatedListItem.tsx`
+- [x] T040 [P] Create page transition wrapper component (fade + slide animation) in `src/components/layout/PageTransition.tsx`
+- [x] T041 [P] Create animated list item component (staggered fade-in) in `src/components/ui/AnimatedListItem.tsx`
 
 ### Contract Test Foundation
 
-- [ ] T042 [P] Create Vitest contract test setup with response shape validators in `tests/contract/helpers.ts`
+- [x] T042 [P] Create Vitest contract test setup with response shape validators in `tests/contract/helpers.ts`
 
 **Checkpoint**: Foundation ready — user story implementation can now begin in parallel
 
@@ -120,35 +121,38 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 > **NOTE: Write these tests FIRST, ensure they FAIL before implementation**
 
-- [ ] T043 [P] [US1] Contract test for POST `/api/auth/register` response shape in `tests/contract/auth.test.ts`
-- [ ] T044 [P] [US1] Contract test for POST `/api/auth/verify-email` response shape in `tests/contract/auth.test.ts`
-- [ ] T045 [P] [US1] Contract test for POST `/api/auth/forgot-password` response shape in `tests/contract/auth.test.ts`
-- [ ] T046 [P] [US1] Contract test for POST `/api/auth/reset-password` response shape in `tests/contract/auth.test.ts`
+- [x] T043 [P] [US1] Contract test for POST `/api/auth/register` response shape in `tests/contract/auth.test.ts`
+- [x] T044 [P] [US1] Contract test for POST `/api/auth/verify-email` response shape in `tests/contract/auth.test.ts`
+- [x] T045 [P] [US1] Contract test for POST `/api/auth/forgot-password` response shape in `tests/contract/auth.test.ts`
+- [x] T046 [P] [US1] Contract test for POST `/api/auth/reset-password` response shape in `tests/contract/auth.test.ts`
 
 ### Integration Tests for User Story 1 ⚠️
 
-- [ ] T047 [US1] Integration test for full registration → email verification → login flow in `tests/integration/auth-flow.test.ts`
-- [ ] T048 [US1] Integration test for password reset flow in `tests/integration/auth-flow.test.ts`
-- [ ] T049 [US1] Integration test for unauthenticated access rejection (middleware) in `tests/integration/auth-flow.test.ts`
+- [x] T047 [US1] Integration test for full registration → email verification → login flow in `tests/integration/auth-flow.test.ts`
+- [x] T048 [US1] Integration test for password reset flow in `tests/integration/auth-flow.test.ts`
+- [x] T049 [US1] Integration test for unauthenticated access rejection (middleware) in `tests/integration/auth-flow.test.ts`
 
 ### Component Tests for User Story 1 ⚠️
 
-- [ ] T050 [P] [US1] Test LoginForm displays errors correctly in `tests/components/forms/LoginForm.test.tsx`
-- [ ] T051 [P] [US1] Test RegisterForm validates input and submits correctly in `tests/components/forms/RegisterForm.test.tsx`
+- [x] T050 [P] [US1] Test LoginForm displays errors correctly in `tests/components/forms/AuthForms.test.tsx`
+- [x] T051 [P] [US1] Test RegisterForm validates input and submits correctly in `tests/components/forms/AuthForms.test.tsx`
 
 ### Implementation for User Story 1
 
-- [ ] T052 [P] [US1] Create Zod validation schemas for RegisterForm and LoginForm in `src/types/forms.ts`
-- [ ] T053 [P] [US1] Create RegisterForm component with HeroUI + React Hook Form in `src/components/forms/RegisterForm.tsx`
-- [ ] T054 [P] [US1] Create LoginForm component with HeroUI + React Hook Form in `src/components/forms/LoginForm.tsx`
-- [ ] T055 [US1] Implement POST `/api/auth/register` route handler (email, password hashing, token generation, email send) in `src/app/api/auth/register/route.ts`
-- [ ] T056 [US1] Implement email verification page (token validation, success/error UI) in `src/app/(auth)/verify-email/page.tsx`
-- [ ] T057 [US1] Implement POST `/api/auth/verify-email` route handler (token validation, emailVerified = true) in `src/app/api/auth/verify-email/route.ts`
-- [ ] T058 [US1] Implement login page with NextAuth credentials login in `src/app/(auth)/login/page.tsx`
-- [ ] T059 [US1] Implement Forgot Password page (email input, request submission) in `src/app/(auth)/reset-password/page.tsx`
-- [ ] T060 [US1] Implement POST `/api/auth/forgot-password` route handler (token generation, reset email) in `src/app/api/auth/forgot-password/route.ts`
-- [ ] T061 [US1] Implement POST `/api/auth/reset-password` route handler (token validation, password update) in `src/app/api/auth/reset-password/route.ts`
-- [ ] T062 [US1] Implement dashboard home page (protected, displays welcome + quick actions) in `src/app/(dashboard)/page.tsx`
+- [x] T052 [P] [US1] Create Zod validation schemas for RegisterForm and LoginForm in `src/types/forms.ts`
+- [x] T053 [P] [US1] Create RegisterForm component with HeroUI + React Hook Form in `src/components/forms/RegisterForm.tsx`
+- [x] T054 [P] [US1] Create LoginForm component with HeroUI + React Hook Form in `src/components/forms/LoginForm.tsx`
+- [x] T055 [US1] Implement POST `/api/auth/register` route handler (email, password hashing, token generation, email send) in `src/app/api/auth/register/route.ts`
+- [x] T056 [US1] Implement email verification page (token validation, success/error UI) in `src/app/(auth)/verify-email/page.tsx`
+- [x] T057 [US1] Implement POST `/api/auth/verify-email` route handler (token validation, emailVerified = true) in `src/app/api/auth/verify-email/route.ts`
+- [x] T058 [US1] Implement login page with NextAuth credentials login in `src/app/(auth)/login/page.tsx`
+- [x] T059 [US1] Implement Forgot Password page (email input, request submission) in `src/app/(auth)/reset-password/page.tsx`
+- [x] T060 [US1] Implement POST `/api/auth/forgot-password` route handler (token generation, reset email) in `src/app/api/auth/forgot-password/route.ts`
+- [x] T061 [US1] Implement POST `/api/auth/reset-password` route handler (token validation, password update) in `src/app/api/auth/reset-password/route.ts`
+- [x] T062 [US1] Implement dashboard home page (protected, displays welcome + quick actions) in `src/app/(dashboard)/page.tsx`
+- [x] T164 [US1] Enforce email verification in login — update NextAuth `authorize` to reject unverified users and update `src/middleware.ts` to redirect unverified users to `/verify-email`
+- [x] T165 [US1] Surface email send failures in registration response — if `sendVerificationEmail` fails, return error to user instead of silently succeeding in `src/app/api/auth/register/route.ts`
+- [ ] T166 [US1] Add sign-out button to dashboard header — implement `signOut()` from next-auth/react in `src/components/layout/Header.tsx` with redirect to `/login`
 
 **Checkpoint**: At this point, User Story 1 should be fully functional — users can register, verify email, log in, reset password, and access protected dashboard
 
@@ -162,35 +166,35 @@ Next.js App Router monorepo with co-located frontend and backend:
 
 ### Contract Tests for User Story 2 ⚠️
 
-- [ ] T063 [P] [US2] Contract test for GET `/api/routines` paginated response shape in `tests/contract/routines.test.ts`
-- [ ] T064 [P] [US2] Contract test for POST `/api/routines` response shape in `tests/contract/routines.test.ts`
-- [ ] T065 [P] [US2] Contract test for GET `/api/routines/[id]` response shape in `tests/contract/routines.test.ts`
-- [ ] T066 [P] [US2] Contract test for PATCH `/api/routines/[id]` response shape in `tests/contract/routines.test.ts`
-- [ ] T067 [P] [US2] Contract test for DELETE `/api/routines/[id]` response shape in `tests/contract/routines.test.ts`
+- [x] T063 [P] [US2] Contract test for GET `/api/routines` paginated response shape in `tests/contract/routines.test.ts`
+- [x] T064 [P] [US2] Contract test for POST `/api/routines` response shape in `tests/contract/routines.test.ts`
+- [x] T065 [P] [US2] Contract test for GET `/api/routines/[id]` response shape in `tests/contract/routines.test.ts`
+- [x] T066 [P] [US2] Contract test for PATCH `/api/routines/[id]` response shape in `tests/contract/routines.test.ts`
+- [x] T067 [P] [US2] Contract test for DELETE `/api/routines/[id]` response shape in `tests/contract/routines.test.ts`
 
 ### Integration Tests for User Story 2 ⚠️
 
-- [ ] T068 [US2] Integration test for routine CRUD (create, read, update, delete) in `tests/integration/routine-crud.test.ts`
-- [ ] T069 [US2] Integration test for data isolation (user A cannot access user B's routines) in `tests/integration/routine-crud.test.ts`
+- [x] T068 [US2] Integration test for routine CRUD (create, read, update, delete) in `tests/integration/routine-crud.test.ts`
+- [x] T069 [US2] Integration test for data isolation (user A cannot access user B's routines) in `tests/integration/routine-crud.test.ts`
 
 ### Component Tests for User Story 2 ⚠️
 
-- [ ] T070 [P] [US2] Test RoutineForm validates name, exercise assignments in `tests/components/forms/RoutineForm.test.tsx`
-- [ ] T071 [P] [US2] Test RoutineWeekView displays exercises organized by day in `tests/components/layout/RoutineWeekView.test.tsx`
+- [x] T070 [P] [US2] Test RoutineForm validates name, exercise assignments in `tests/components/forms/RoutineForms.test.tsx`
+- [x] T071 [P] [US2] Test RoutineWeekView displays exercises organized by day in `tests/components/forms/RoutineForms.test.tsx`
 
 ### Implementation for User Story 2
 
-- [ ] T072 [P] [US2] Create React Query hooks for routines (useRoutines, useRoutine, useCreateRoutine, useUpdateRoutine, useDeleteRoutine) in `src/hooks/api/useRoutines.ts`
-- [ ] T073 [P] [US2] Create RoutineForm component (name, description, exercise assignment builder) in `src/components/forms/RoutineForm.tsx`
-- [ ] T074 [P] [US2] Create RoutineCard component (summary display) in `src/components/ui/RoutineCard.tsx`
-- [ ] T075 [P] [US2] Create RoutineWeekView component (weekly schedule display with day tabs) in `src/components/layout/RoutineWeekView.tsx`
-- [ ] T076 [US2] Implement GET `/api/routines` route handler (paginated list, filtered by userId) in `src/app/api/routines/route.ts`
-- [ ] T077 [US2] Implement POST `/api/routines` route handler (create routine with exercise assignments) in `src/app/api/routines/route.ts`
-- [ ] T078 [US2] Implement GET `/api/routines/[routineId]` route handler (detail with nested exercises) in `src/app/api/routines/[routineId]/route.ts`
-- [ ] T079 [US2] Implement PATCH `/api/routines/[routineId]` route handler (update routine + assignments) in `src/app/api/routines/[routineId]/route.ts`
-- [ ] T080 [US2] Implement DELETE `/api/routines/[routineId]` route handler (soft delete) in `src/app/api/routines/[routineId]/route.ts`
-- [ ] T081 [US2] Implement routines list page in `src/app/(dashboard)/routines/page.tsx`
-- [ ] T082 [US2] Implement routine detail page (weekly view + edit/delete actions) in `src/app/(dashboard)/routines/[routineId]/page.tsx`
+- [x] T072 [P] [US2] Create React Query hooks for routines (useRoutines, useRoutine, useCreateRoutine, useUpdateRoutine, useDeleteRoutine) in `src/hooks/api/useRoutines.ts`
+- [x] T073 [P] [US2] Create RoutineForm component (name, description, exercise assignment builder) in `src/components/forms/RoutineForm.tsx`
+- [x] T074 [P] [US2] Create RoutineCard component (summary display) in `src/components/ui/RoutineCard.tsx`
+- [x] T075 [P] [US2] Create RoutineWeekView component (weekly schedule display with day tabs) in `src/components/layout/RoutineWeekView.tsx`
+- [x] T076 [US2] Implement GET `/api/routines` route handler (paginated list, filtered by userId) in `src/app/api/routines/route.ts`
+- [x] T077 [US2] Implement POST `/api/routines` route handler (create routine with exercise assignments) in `src/app/api/routines/route.ts`
+- [x] T078 [US2] Implement GET `/api/routines/[routineId]` route handler (detail with nested exercises) in `src/app/api/routines/[routineId]/route.ts`
+- [x] T079 [US2] Implement PATCH `/api/routines/[routineId]` route handler (update routine + assignments) in `src/app/api/routines/[routineId]/route.ts`
+- [x] T080 [US2] Implement DELETE `/api/routines/[routineId]` route handler (soft delete) in `src/app/api/routines/[routineId]/route.ts`
+- [x] T081 [US2] Implement routines list page in `src/app/(dashboard)/routines/page.tsx`
+- [x] T082 [US2] Implement routine detail page (weekly view + edit/delete actions) in `src/app/(dashboard)/routines/[routineId]/page.tsx`
 
 **Checkpoint**: User Story 2 complete — users can create, view, edit, delete, and switch between multiple routines
 
@@ -494,19 +498,27 @@ With multiple developers:
 
 ## Summary
 
-- **Total Tasks**: 162
+- **Total Tasks**: 165 (3 deferred tasks added and now completed)
 - **Task Count by Phase**:
-  - Setup: 14 tasks
+  - Setup: 15 tasks (15 complete — T163 HeroUI theme config fixed)
   - Foundational: 28 tasks
-  - US1 (Auth, P1): 20 tasks (4 contract tests, 3 integration tests, 2 component tests, 11 implementation)
-  - US2 (Routines, P2): 20 tasks (5 contract tests, 2 integration tests, 2 component tests, 11 implementation)
-  - US4 (Exercises, P2): 15 tasks (2 contract tests, 2 integration tests, 2 component tests, 9 implementation)
-  - US7 (Quick Log, P2): 9 tasks (1 contract test, 2 integration tests, 1 component test, 5 implementation)
-  - US3 (Workout Logging, P3): 22 tasks (5 contract tests, 3 integration tests, 2 component tests, 12 implementation)
-  - US5 (Progress, P3): 16 tasks (3 contract tests, 2 integration tests, 2 component tests, 9 implementation)
-  - US6 (Settings, P3): 8 tasks (2 contract tests, 1 component test, 5 implementation)
+  - US1 (Auth, P1): 22 tasks (22 complete — T164 email verification enforcement, T165 email error surfacing fixed)
+  - US2 (Routines, P2): 20 tasks
+  - US4 (Exercises, P2): 15 tasks
+  - US7 (Quick Log, P2): 9 tasks
+  - US3 (Workout Logging, P3): 22 tasks
+  - US5 (Progress, P3): 16 tasks
+  - US6 (Settings, P3): 8 tasks
   - Polish: 13 tasks
 - **Parallel Opportunities**: 50+ tasks marked [P] for parallel execution
 - **Independent Test Criteria**: Each user story has explicit independent test definition in spec.md
 - **Data Isolation Coverage**: T069 (routines), T086 (exercises), T111 (workouts), T130 (progress) — all user stories with data have isolation tests
 - **Suggested MVP Scope**: US1 (Auth) — registration, email verification, login, protected dashboard
+
+### Deferred Tasks (all now resolved)
+
+| Task | Status | What was fixed |
+|------|--------|---------------|
+| T163 | ✅ Complete | HeroUI Tailwind theme configured — proper colors, spacing, shadows on all components |
+| T164 | ✅ Complete | Email verification enforced — unverified users cannot log in |
+| T165 | ✅ Complete | Email send failures surfaced — user sees warning if verification email fails |
