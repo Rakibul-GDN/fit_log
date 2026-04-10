@@ -1,70 +1,66 @@
-import { Skeleton } from '@/components/feedback/Skeleton';
-import { Card } from '@/components/ui/Card';
+import { Skeleton } from '@/components/ui/skeleton';
+import { Card, CardContent } from '@/components/ui/card';
 
-/** Skeleton for routine list cards */
-export function RoutineListSkeleton(): React.ReactElement {
+export function RoutineListSkeleton() {
   return (
-    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <Card key={i}>
-          <div className='p-4 space-y-3'>
-            <Skeleton variant='text' height='1.25rem' />
-            <Skeleton variant='text' height='0.875rem' />
-            <div className='flex gap-2 pt-2'>
-              <Skeleton variant='rectangular' height='2rem' width='5rem' />
-              <Skeleton variant='rectangular' height='2rem' width='5rem' />
+          <CardContent className="space-y-3 p-4">
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <div className="flex gap-2 pt-2">
+              <Skeleton className="h-8 w-20" />
+              <Skeleton className="h-8 w-20" />
             </div>
-          </div>
+          </CardContent>
         </Card>
       ))}
     </div>
   );
 }
 
-/** Skeleton for workout history cards */
-export function WorkoutListSkeleton(): React.ReactElement {
+export function WorkoutListSkeleton() {
   return (
-    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 6 }).map((_, i) => (
         <Card key={i}>
-          <div className='p-4 space-y-3'>
-            <Skeleton variant='text' height='1.25rem' />
-            <Skeleton variant='text' height='0.875rem' />
-            <Skeleton variant='text' height='0.875rem' />
-          </div>
+          <CardContent className="space-y-3 p-4">
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-1/3" />
+          </CardContent>
         </Card>
       ))}
     </div>
   );
 }
 
-/** Skeleton for exercise library grid */
-export function ExerciseListSkeleton(): React.ReactElement {
+export function ExerciseListSkeleton() {
   return (
-    <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
       {Array.from({ length: 9 }).map((_, i) => (
         <Card key={i}>
-          <div className='p-4 space-y-3'>
-            <Skeleton variant='text' height='1.25rem' />
-            <Skeleton variant='text' height='0.875rem' />
-            <Skeleton variant='text' height='0.875rem' />
-          </div>
+          <CardContent className="space-y-3 p-4">
+            <Skeleton className="h-5 w-3/4" />
+            <Skeleton className="h-4 w-1/2" />
+            <Skeleton className="h-4 w-1/3" />
+          </CardContent>
         </Card>
       ))}
     </div>
   );
 }
 
-/** Skeleton for progress chart area */
-export function ProgressSkeleton(): React.ReactElement {
+export function ProgressSkeleton() {
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       {Array.from({ length: 2 }).map((_, i) => (
         <Card key={i}>
-          <div className='p-4 space-y-3'>
-            <Skeleton variant='text' height='1.25rem' width='8rem' />
-            <Skeleton variant='rectangular' height='16rem' />
-          </div>
+          <CardContent className="space-y-3 p-4">
+            <Skeleton className="h-5 w-32" />
+            <Skeleton className="h-64 w-full" />
+          </CardContent>
         </Card>
       ))}
     </div>

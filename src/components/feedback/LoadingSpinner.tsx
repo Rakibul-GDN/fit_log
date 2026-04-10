@@ -1,27 +1,20 @@
-import { Spinner } from '@heroui/react';
-import type { SpinnerProps } from '@heroui/react';
+'use client';
 
-/**
- * Loading spinner props extending HeroUI SpinnerProps.
- */
-export interface LoadingSpinnerProps extends SpinnerProps {
-  fullScreen?: boolean;
+import { cn } from '@/lib/utils';
+
+interface LoadingSpinnerProps {
+  size?: 'sm' | 'md' | 'lg';
+  className?: string;
 }
 
-/**
- * Loading spinner component with optional full-screen overlay.
- */
-export function LoadingSpinner({
-  fullScreen = false,
-  ...props
-}: LoadingSpinnerProps) {
-  if (fullScreen) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center bg-background/80 backdrop-blur-sm z-50">
-        <Spinner {...props} />
-      </div>
-    );
-  }
-
-  return <Spinner {...props} />;
+export function LoadingSpinner({ size = 'md', className }: LoadingSpinnerProps) {
+  const sizes = { sm: 'h-4 w-4', md: 'h-8 w-8', lg: 'h-12 w-12' };
+  return (
+    <div className={cn('animate-spin', sizes[size], className)} role="status" aria-label="Loading">
+      <svg className="h-full w-full" viewBox="0 0 24 24" fill="none">
+        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+        <path className="opacity-75" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" fill="currentColor" />
+      </svg>
+    </div>
+  );
 }

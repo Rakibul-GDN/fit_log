@@ -1,61 +1,68 @@
 'use client';
 
-import type { ReactNode } from 'react';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { cn } from '@/lib/utils';
 
-/** Day of week labels */
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;
 
-/** Exercise assignment data */
-export interface ExerciseAssignment {
+interface ExerciseAssignment {
   id: string;
+  exerciseId: string;
+  exerciseName: string;
   dayOfWeek: string;
-  order: number;
-  exercise: { id: string; name: string; category: string };
   defaultSets: number;
   defaultReps: number;
   defaultWeight: number;
+  order: number;
 }
 
-/** Routine week view props */
-export interface RoutineWeekViewProps {
-  assignments: ExerciseAssignment[];
+interface RoutineWeekViewProps {
+  assignments?: ExerciseAssignment[];
+  className?: string;
 }
 
-/**
- * RoutineWeekView — displays exercises organized by day with tabs.
- */
-export function RoutineWeekView({ assignments }: RoutineWeekViewProps): ReactNode {
+export function RoutineWeekView({ assignments = [], className }: RoutineWeekViewProps) {
+  const groupedByDay = new Map<string, ExerciseAssignment[]>();
+  for (const a of assignments) {
+    const existing = groupedByDay.get(a.dayOfWeek) ?? [];
+    existing.push(a);
+    existing.sort((a, b) => a.order - b.order);
+    groupedByDay.set(a.dayOfWeek, existing);
+  }
+
   return (
-    <div className='w-full'>
-      <div className='flex gap-1 overflow-x-auto border-b border-default-200 pb-2'>
-        {DAYS.map((day) => {
-          const dayAssignments = assignments.filter((a) => a.dayOfWeek === day);
-          return (
-            <div
-              className='flex min-w-[140px] flex-col gap-2 rounded-t-lg border border-b-0 border-default-200 px-3 py-2'
-              key={day}
-            >
-              <h4 className='text-sm font-semibold capitalize'>{day.toLowerCase()}</h4>
-              {dayAssignments.length === 0 ? (
-                <p className='text-xs text-default-400'>Rest day</p>
-              ) : (
-                <ul className='flex flex-col gap-1'>
-                  {dayAssignments
-                    .sort((a, b) => a.order - b.order)
-                    .map((assignment) => (
-                      <li className='rounded bg-default-100 px-2 py-1 text-xs' key={assignment.id}>
-                        <p className='font-medium'>{assignment.exercise.name}</p>
-                        <p className='text-default-500'>
-                          {assignment.defaultSets} × {assignment.defaultReps} @ {assignment.defaultWeight}kg
-                        </p>
-                      </li>
-                    ))}
+    <div className={cn('space-y-4', className)}>
+      {DAYS.map((day) => {
+        const dayAssignments = groupedByDay.get(day) ?? [];
+        return (
+          <Card key={day}>
+            <CardHeader className="pb-2">
+              <CardTitle className="text-base">
+                {day.charAt(0) + day.slice(1).toLowerCase()}
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              {dayAssignments.length > 0 ? (
+                <ul className="space-y-2">
+                  {dayAssignments.map((a) => (
+                    <li key={a.id} className="flex items-center justify-between rounded-md border px-3 py-2 text-sm">
+                      <span className="font-medium">{a.exerciseName}</span>
+                      <div className="flex gap-2">
+                        <Badge variant="secondary">{a.defaultSets} sets</Badge>
+                        <Badge variant="secondary">{a.defaultReps} reps</Badge>
+                        <Badge variant="outline">{a.defaultWeight} kg</Badge>
+                      </div>
+                    </li>
+                  ))}
                 </ul>
+              ) : (
+                <p className="text-sm text-muted-foreground">Rest day</p>
               )}
-            </div>
-          );
-        })}
-      </div>
+            </CardContent>
+          </Card>
+        );
+      })}
     </div>
   );
 }

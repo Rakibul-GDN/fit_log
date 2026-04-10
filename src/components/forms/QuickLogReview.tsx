@@ -1,13 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useExercises } from '@/hooks/api/useExercises';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 
-/** Log entry with editable fields */
 interface LogEntry {
   id: string;
   exerciseId: string;
@@ -18,7 +17,6 @@ interface LogEntry {
   notes: string;
 }
 
-/** Quick log review props */
 export interface QuickLogReviewProps {
   entries: LogEntry[];
   _routineId?: string;
@@ -27,141 +25,76 @@ export interface QuickLogReviewProps {
   onDiscard: () => void;
 }
 
-/**
- * QuickLogReview — pre-filled exercise list with editable sets/reps/weight.
- */
-export function QuickLogReview({
-  entries: initialEntries,
-  _routineId,
-  dayOfWeek,
-  onSave,
-  onDiscard,
-}: QuickLogReviewProps): ReactNode {
+export function QuickLogReview({ entries: initialEntries, dayOfWeek, onSave, onDiscard }: QuickLogReviewProps): ReactNode {
   const [entries, setEntries] = useState<LogEntry[]>(initialEntries);
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
-
   const { data: exercisesData } = useExercises(1, 100);
 
   const updateEntry = (index: number, field: keyof LogEntry, value: unknown): void => {
-    setEntries((prev) => {
-      const updated = [...prev];
-      updated[index] = { ...updated[index], [field]: value };
-      return updated;
-    });
+    setEntries((prev) => { const u = [...prev]; u[index] = { ...u[index], [field]: value }; return u; });
   };
 
-  const removeEntry = (index: number): void => {
-    setEntries((prev) => prev.filter((_, i) => i !== index));
-  };
+  const removeEntry = (index: number): void => setEntries((p) => p.filter((_, i) => i !== index));
 
   const addExercise = (exerciseId: string): void => {
     const exercise = exercisesData?.data?.find((e) => e.id === exerciseId);
     if (!exercise) return;
-
-    setEntries((prev) => [
-      ...prev,
-      {
-        id: `new-${Date.now()}`,
-        exerciseId: exercise.id,
-        exerciseName: exercise.name,
-        setsCompleted: 3,
-        repsPerSet: [10, 10, 10],
-        weight: 0,
-        notes: '',
-      },
-    ]);
+    setEntries((prev) => [...prev, { id: `new-${Date.now()}`, exerciseId: exercise.id, exerciseName: exercise.name, setsCompleted: 3, repsPerSet: [10, 10, 10], weight: 0, notes: '' }]);
   };
 
   const handleSave = async (): Promise<void> => {
     setIsSaving(true);
-    try {
-      await onSave(entries);
-      router.push('/workouts');
-    } catch {
-      // Error handled by mutation
-    } finally {
-      setIsSaving(false);
-    }
+    try { await onSave(entries); router.push('/workouts'); }
+    catch { /* toast will show */ }
+    finally { setIsSaving(false); }
   };
 
   return (
-    <div className='space-y-6'>
-      <div className='flex items-center justify-between'>
-        <div>
-          <h2 className='text-2xl font-bold'>Quick Log — {dayOfWeek.replace(/_/g, ' ').toLowerCase()}</h2>
-          <p className='text-sm text-default-500'>Review and edit your workout before saving</p>
-        </div>
-        <div className='flex gap-2'>
-          <Button color='danger' onPress={onDiscard}>
-            Discard
-          </Button>
-          <Button isLoading={isSaving} onPress={() => void handleSave()}>
-            Save Workout
-          </Button>
-        </div>
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-2xl font-bold">Review Workout — {dayOfWeek.charAt(0) + dayOfWeek.slice(1).toLowerCase()}</h2>
+        <p className="text-muted-foreground">Review and edit your workout before saving</p>
       </div>
 
-      <div className='space-y-4'>
+      <div className="space-y-4">
         {entries.map((entry, i) => (
-          <div className='rounded-lg border border-default-200 bg-card p-4' key={entry.id}>
-            <div className='mb-3 flex items-center justify-between'>
-              <h4 className='font-semibold'>{entry.exerciseName}</h4>
-              <Button color='danger' size='sm' onPress={() => removeEntry(i)}>
-                Remove
-              </Button>
+          <div key={entry.id} className="rounded-lg border bg-card p-4">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="font-medium">{entry.exerciseName}</span>
+              <Button variant="destructive" size="sm" onClick={() => removeEntry(i)}>×</Button>
             </div>
-            <div className='grid grid-cols-3 gap-3'>
-              <Input
-                label='Sets'
-                type='number'
-                value={entry.setsCompleted}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const sets = parseInt(e.target.value, 10) || 1;
-                  updateEntry(i, 'setsCompleted', sets);
-                  updateEntry(i, 'repsPerSet', Array(sets).fill(10));
-                }}
-              />
-              <Input
-                label='Reps per set'
-                type='text'
-                value={entry.repsPerSet.join(', ')}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-                  const reps = e.target.value
-                    .split(',')
-                    .map((r) => parseInt(r.trim(), 10) || 10);
-                  updateEntry(i, 'repsPerSet', reps);
-                }}
-              />
-              <Input
-                label='Weight (kg)'
-                type='number'
-                value={entry.weight}
-                onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-                  updateEntry(i, 'weight', parseFloat(e.target.value) || 0)
-                }
-              />
+            <div className="grid grid-cols-3 gap-3">
+              <div>
+                <Label>Sets</Label>
+                <Input type="number" value={entry.setsCompleted} onChange={(e) => updateEntry(i, 'setsCompleted', parseInt(e.target.value, 10) || 1)} />
+              </div>
+              <div>
+                <Label>Reps per set</Label>
+                <Input value={entry.repsPerSet.join(', ')} onChange={(e) => updateEntry(i, 'repsPerSet', e.target.value.split(',').map((r) => parseInt(r.trim(), 10) || 10))} />
+              </div>
+              <div>
+                <Label>Weight</Label>
+                <Input type="number" value={entry.weight} onChange={(e) => updateEntry(i, 'weight', parseFloat(e.target.value) || 0)} />
+              </div>
             </div>
           </div>
         ))}
       </div>
 
       {/* Add exercise dropdown */}
-      <div className='flex items-center gap-2'>
-        <select
-          className='flex-1 rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
-          onChange={(e) => {
-            if (e.target.value) addExercise(e.target.value);
-            e.target.value = '';
-          }}
-        >
-          <option value=''>+ Add Exercise</option>
-          {exercisesData?.data?.map((ex) => (
-            <option key={ex.id} value={ex.id}>
-              {ex.name}
-            </option>
-          ))}
+      <div className="flex gap-2">
+        <select className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm" onChange={(e) => { if (e.target.value) { addExercise(e.target.value); e.target.value = ''; } }}>
+          <option value="">+ Add exercise...</option>
+          {exercisesData?.data?.map((ex) => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
         </select>
+      </div>
+
+      <div className="flex gap-3">
+        <Button onClick={handleSave} disabled={isSaving} className="flex-1">
+          {isSaving ? 'Saving...' : 'Save Workout'}
+        </Button>
+        <Button variant="outline" onClick={onDiscard}>Discard</Button>
       </div>
     </div>
   );

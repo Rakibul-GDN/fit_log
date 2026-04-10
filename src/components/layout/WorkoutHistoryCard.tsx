@@ -1,46 +1,44 @@
-import { Card } from '@/components/ui/Card';
-import Link from 'next/link';
-import type { ReactNode } from 'react';
+'use client';
 
-/** Workout history card props */
-export interface WorkoutHistoryCardProps {
+import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Dumbbell } from 'lucide-react';
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+
+interface WorkoutHistoryCardProps {
   id: string;
   dayOfWeek: string;
   workoutDate: string;
   exerciseCount: number;
   routineName?: string | null;
+  className?: string;
 }
 
-/**
- * WorkoutHistoryCard — displays session summary with link to detail.
- */
 export function WorkoutHistoryCard({
-  id,
-  dayOfWeek,
-  workoutDate,
-  exerciseCount,
-  routineName,
-}: WorkoutHistoryCardProps): ReactNode {
+  id, dayOfWeek, workoutDate, exerciseCount, routineName, className,
+}: WorkoutHistoryCardProps) {
   const date = new Date(workoutDate);
   const formatted = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
 
   return (
     <Link href={`/workouts/${id}`}>
-      <Card className='cursor-pointer transition hover:shadow-md'>
-        <div className='p-4'>
-          <div className='flex items-center justify-between'>
+      <Card className={cn('cursor-pointer transition hover:shadow-md', className)}>
+        <CardContent className="p-4">
+          <div className="flex items-center justify-between">
             <div>
-              <h4 className='font-semibold'>{formatted}</h4>
-              <p className='text-sm text-default-500'>
+              <h4 className="font-semibold">{formatted}</h4>
+              <p className="text-sm text-muted-foreground">
                 {dayOfWeek.charAt(0) + dayOfWeek.slice(1).toLowerCase()}
                 {routineName && ` • ${routineName}`}
               </p>
             </div>
-            <span className='rounded-full bg-default-100 px-3 py-1 text-xs text-default-600'>
+            <Badge variant="secondary">
+              <Dumbbell className="mr-1 h-3 w-3" />
               {exerciseCount} exercise{exerciseCount !== 1 ? 's' : ''}
-            </span>
+            </Badge>
           </div>
-        </div>
+        </CardContent>
       </Card>
     </Link>
   );

@@ -52,11 +52,11 @@ export class ErrorBoundary extends ReactComponent<
       }
       return (
         this.props.fallback ?? (
-          <div className="p-4 rounded-lg bg-danger-50 text-danger-700">
+          <div className="p-4 rounded-lg bg-destructive/10 text-destructive">
             <h2 className="text-lg font-semibold">Something went wrong</h2>
             <p className="text-sm mt-1">{this.state.error?.message}</p>
             <button
-              className="mt-2 px-3 py-1 text-sm bg-danger-100 rounded hover:bg-danger-200"
+              className="mt-2 px-3 py-1 text-sm bg-destructive/20 rounded hover:bg-destructive/30"
               onClick={this.reset}
               type="button"
             >

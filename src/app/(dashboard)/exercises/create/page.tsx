@@ -1,124 +1,74 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { useCreateExercise } from '@/hooks/api/useExercises';
-import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { useState, useCallback } from 'react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useRouter } from 'next/navigation';
-import { useState } from 'react';
 
-const CATEGORIES = [
-  'BARBELL',
-  'DUMBBELL',
-  'MACHINE',
-  'CABLE',
-  'BODYWEIGHT',
-  'KETTLEBELL',
-  'RESISTANCE_BAND',
-  'OTHER',
-] as const;
+const exerciseSchema = z.object({
+  name: z.string().min(1).max(100),
+  description: z.string().max(500).optional(),
+  category: z.enum(['BARBELL', 'DUMBBELL', 'MACHINE', 'CABLE', 'BODYWEIGHT', 'KETTLEBELL', 'RESISTANCE_BAND', 'OTHER']),
+  primaryMuscles: z.array(z.string().min(1)).min(1),
+});
 
-/** Create custom exercise form page. */
+type ExerciseFormValues = z.infer<typeof exerciseSchema>;
+
 export default function CreateExercisePage(): React.ReactElement {
   const router = useRouter();
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
-  const [category, setCategory] = useState<typeof CATEGORIES[number]>(CATEGORIES[0]);
-  const [muscles, setMuscles] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [serverError, setServerError] = useState<string | null>(null);
+  const { register, handleSubmit, formState: { errors } } = useForm<ExerciseFormValues>({
+    resolver: zodResolver(exerciseSchema),
+    defaultValues: { name: '', description: '', category: 'BARBELL', primaryMuscles: [''] },
+  });
 
-  const createMutation = useCreateExercise();
-
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
-    e.preventDefault();
-    setError(null);
-
-    if (!name.trim()) {
-      setError('Exercise name is required.');
-      return;
-    }
-
-    const primaryMuscles = muscles
-      .split(',')
-      .map((m) => m.trim())
-      .filter(Boolean);
-
-    if (primaryMuscles.length === 0) {
-      setError('At least one muscle group is required.');
-      return;
-    }
-
+  const onSubmit = useCallback(async (data: ExerciseFormValues): Promise<void> => {
+    setServerError(null);
     try {
-      await createMutation.mutateAsync({
-        name: name.trim(),
-        description: description.trim() || undefined,
-        category,
-        primaryMuscles,
+      const res = await fetch('/api/exercises', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
       });
+      if (!res.ok) {
+        const err = (await res.json()) as { error?: { message?: string } };
+        setServerError(err.error?.message ?? 'Failed to create exercise');
+        return;
+      }
       router.push('/exercises');
-    } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to create exercise.';
-      setError(message.includes('401') ? 'You must be logged in to create exercises.' : message);
+    } catch {
+      setServerError('An unexpected error occurred.');
     }
-  };
+  }, [router]);
 
   return (
-    <div className='mx-auto max-w-2xl px-4 py-8'>
-      <h1 className='mb-6 text-3xl font-bold'>Create Custom Exercise</h1>
-
-      {error && (
-        <div className='mb-4 rounded-lg border border-danger-200 bg-danger-50 p-4 text-sm text-danger-700'>
-          {error}
-        </div>
-      )}
-
-      <form className='space-y-6' onSubmit={handleSubmit}>
-        <Input
-          label='Exercise Name'
-          placeholder='e.g., Dumbbell Hammer Curl'
-          value={name}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setName(e.target.value)}
-        />
-
-        <Input
-          label='Description (optional)'
-          placeholder='Notes about form, technique, etc.'
-          value={description}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDescription(e.target.value)}
-        />
-
+    <div className="mx-auto max-w-2xl px-4 py-8">
+      <h1 className="mb-6 text-3xl font-bold">Create Custom Exercise</h1>
+      {serverError && <div className="mb-4 rounded border border-destructive/50 bg-destructive/10 p-3 text-sm text-destructive">{serverError}</div>}
+      <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+        <Input label="Exercise Name" {...register('name')} />
+        {errors.name && <p className="text-sm text-destructive">{errors.name.message}</p>}
+        <Input label="Description (optional)" {...register('description')} />
         <div>
-          <label className='mb-1 block text-sm font-medium'>Category</label>
-          <select
-            className='w-full rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
-            value={category}
-            onChange={(e) => setCategory(e.target.value as typeof CATEGORIES[number])}
-          >
-            {CATEGORIES.map((cat) => (
-              <option key={cat} value={cat}>
-                {cat.replace(/_/g, ' ')}
-              </option>
+          <label className="mb-1 block text-sm font-medium">Category</label>
+          <select className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" {...register('category')}>
+            {['BARBELL', 'DUMBBELL', 'MACHINE', 'CABLE', 'BODYWEIGHT', 'KETTLEBELL', 'RESISTANCE_BAND', 'OTHER'].map((c) => (
+              <option key={c} value={c}>{c.replace(/_/g, ' ')}</option>
             ))}
           </select>
+          {errors.category && <p className="text-sm text-destructive">{errors.category.message}</p>}
         </div>
-
-        <Input
-          label='Muscle Groups (comma-separated)'
-          placeholder='e.g., Biceps, Forearms'
-          value={muscles}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setMuscles(e.target.value)}
-        />
-
-        <div className='flex gap-3'>
-          <Button isLoading={createMutation.isPending} type='submit'>
-            Create Exercise
-          </Button>
-          <Link
-            className='rounded-md border border-default-200 px-4 py-2 text-sm transition hover:bg-default-100'
-            href='/exercises'
-          >
-            Cancel
-          </Link>
+        <div>
+          <label className="mb-1 block text-sm font-medium">Primary Muscles (comma-separated)</label>
+          <input className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" {...register('primaryMuscles', { setValueAs: (v: string) => v.split(',').map((s) => s.trim()) })} />
+          {errors.primaryMuscles && <p className="text-sm text-destructive">{errors.primaryMuscles.message}</p>}
+        </div>
+        <div className="flex gap-3">
+          <Button type="submit">Create Exercise</Button>
+          <Button variant="outline" type="button" onClick={() => router.push('/exercises')}>Cancel</Button>
         </div>
       </form>
     </div>

@@ -1,224 +1,115 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { Suspense, useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useCallback, useState } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
 
-const forgotPasswordSchema = z.object({
-  email: z.email(),
-});
+const forgotSchema = z.object({ email: z.email() });
+const resetSchema = z.object({ password: z.string().min(8).regex(/[A-Z]/).regex(/[a-z]/).regex(/[0-9]/), confirmPassword: z.string() }).refine((d) => d.password === d.confirmPassword, { message: 'Passwords do not match.', path: ['confirmPassword'] });
 
-const resetPasswordSchema = z
-  .object({
-    password: z
-      .string()
-      .min(8, 'Password must be at least 8 characters.')
-      .regex(/[A-Z]/, 'Password must contain an uppercase letter.')
-      .regex(/[a-z]/, 'Password must contain a lowercase letter.')
-      .regex(/[0-9]/, 'Password must contain a number.'),
-    confirmPassword: z.string().min(1, 'Please confirm your password.'),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "Passwords don't match.",
-    path: ['confirmPassword'],
-  });
+type ForgotValues = z.infer<typeof forgotSchema>;
+type ResetValues = z.infer<typeof resetSchema>;
 
-type ForgotFormValues = z.infer<typeof forgotPasswordSchema>;
-type ResetFormValues = z.infer<typeof resetPasswordSchema>;
-
-/**
- * Reset password page — handles both forgot password request and actual password reset.
- */
 export default function ResetPasswordPage(): React.ReactElement {
-  return (
-    <Suspense fallback={<div className='flex min-h-screen items-center justify-center'>Loading...</div>}>
-      <ResetPasswordContent />
-    </Suspense>
-  );
-}
-
-function ResetPasswordContent(): React.ReactElement {
-  const searchParams = useSearchParams();
+  const searchParams = typeof window !== 'undefined' ? new URLSearchParams(window.location.search) : new URLSearchParams();
   const token = searchParams.get('token');
 
-  if (token) {
-    return (
-      <div className='flex min-h-screen items-center justify-center px-4'>
-        <div className='w-full max-w-md rounded-lg border border-default-200 bg-card p-8 shadow-lg'>
-          <div className='mb-6 text-center'>
-            <h1 className='text-2xl font-bold'>Set New Password</h1>
-            <p className='mt-1 text-sm text-default-500'>
-              Enter your new password below
-            </p>
-          </div>
-          <ResetForm token={token} />
+  if (token) return <ResetPasswordForm token={token} />;
+  return <ForgotPasswordForm />;
+}
+
+function ForgotPasswordForm(): React.ReactElement {
+  const { register, handleSubmit, formState: { errors } } = useForm<ForgotValues>({ resolver: zodResolver(forgotSchema) });
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [message, setMessage] = useState('');
+
+  const onSubmit = useCallback(async (data: ForgotValues): Promise<void> => {
+    setStatus('sending');
+    try {
+      const res = await fetch('/api/auth/forgot-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+      const result = (await res.json()) as { success: boolean; data?: { message?: string }; error?: { message?: string } };
+      if (res.ok && result.success) { setStatus('sent'); setMessage(result.data?.message ?? 'Check your email.'); }
+      else { setStatus('error'); setMessage(result.error?.message ?? 'Failed.'); }
+    } catch { setStatus('error'); setMessage('An unexpected error occurred.'); }
+  }, []);
+
+  if (status === 'sent') return (
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-lg">
+        <div className="rounded border border-emerald-200 bg-emerald-50 p-6 text-center">
+          <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100"><span className="text-2xl text-emerald-600">✓</span></div>
+          <h2 className="text-xl font-semibold text-emerald-700">Check Your Email</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{message}</p>
+          <Link className="mt-4 inline-block text-sm text-primary hover:underline" href="/login">← Back to Login</Link>
         </div>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <div className='flex min-h-screen items-center justify-center px-4'>
-      <div className='w-full max-w-md rounded-lg border border-default-200 bg-card p-8 shadow-lg'>
-        <div className='mb-6 text-center'>
-          <h1 className='text-2xl font-bold'>Reset Password</h1>
-          <p className='mt-1 text-sm text-default-500'>
-            Enter your email and we&apos;ll send you a reset link
-          </p>
-        </div>
-        <ForgotPasswordForm />
-        <p className='mt-6 text-center text-sm text-default-500'>
-          <Link className='font-medium text-primary hover:underline' href='/login'>
-            Back to Login
-          </Link>
-        </p>
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-lg">
+        <h1 className="text-2xl font-bold">Forgot Password</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Enter your email to receive a reset link.</p>
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <Input label="Email" type="email" {...register('email')} />
+          {errors.email && <p className="text-sm text-destructive">{errors.email.message}</p>}
+          {status === 'error' && <p className="text-sm text-destructive">{message}</p>}
+          <Button type="submit" disabled={status === 'sending'} className="w-full">{status === 'sending' ? 'Sending...' : 'Send Reset Link'}</Button>
+          <Link className="text-sm text-primary hover:underline" href="/login">← Back to Login</Link>
+        </form>
       </div>
     </div>
   );
 }
 
-/** Forgot password form */
-function ForgotPasswordForm(): React.ReactElement {
-  const [success, setSuccess] = useState<string | null>(null);
+function ResetPasswordForm({ token }: { token: string }): React.ReactElement {
+  const { register, handleSubmit, formState: { errors } } = useForm<ResetValues>({ resolver: zodResolver(resetSchema) });
   const [serverError, setServerError] = useState<string | null>(null);
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ForgotFormValues>({
-    resolver: zodResolver(forgotPasswordSchema),
-  });
-
-  const onSubmit = async (data: ForgotFormValues): Promise<void> => {
-    setServerError(null);
-    setSuccess(null);
-
-    try {
-      const res = await fetch('/api/auth/forgot-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: data.email }),
-      });
-
-      const result = (await res.json()) as {
-        success: boolean;
-        data?: { message?: string };
-        error?: { message?: string };
-      };
-
-      if (res.ok && result.success) {
-        setSuccess(result.data?.message ?? 'Reset link sent if account exists.');
-      } else {
-        setServerError(result.error?.message ?? 'Request failed.');
-      }
-    } catch {
-      setServerError('An unexpected error occurred.');
-    }
-  };
-
-  return (
-    <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
-      <Input label='Email' type='email' {...register('email')} />
-      {errors.email && (
-        <p className='text-sm text-danger-600'>{errors.email.message}</p>
-      )}
-
-      {serverError && <p className='text-sm text-danger-600'>{serverError}</p>}
-
-      {success && <p className='text-sm text-success-600'>{success}</p>}
-
-      <Button className='w-full' isLoading={isSubmitting} type='submit'>
-        Send Reset Link
-      </Button>
-    </form>
-  );
-}
-
-/** Reset password form (when token is present) */
-function ResetForm({ token }: { token: string }): React.ReactElement {
   const [success, setSuccess] = useState<string | null>(null);
-  const [serverError, setServerError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<ResetFormValues>({
-    resolver: zodResolver(resetPasswordSchema),
-  });
-
-  const onSubmit = async (data: ResetFormValues): Promise<void> => {
-    setServerError(null);
-    setSuccess(null);
-
+  const onSubmit = useCallback(async (data: ResetValues): Promise<void> => {
+    setIsSubmitting(true); setServerError(null);
     try {
-      const res = await fetch('/api/auth/reset-password', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ token, password: data.password }),
-      });
+      const res = await fetch('/api/auth/reset-password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ token, password: data.password }) });
+      const result = (await res.json()) as { success: boolean; error?: { message?: string } };
+      if (!res.ok || !result.success) { setServerError(result.error?.message ?? 'Failed.'); return; }
+      setSuccess('Password reset successfully. You can now log in.');
+    } catch { setServerError('An unexpected error occurred.'); }
+    finally { setIsSubmitting(false); }
+  }, [token]);
 
-      const result = (await res.json()) as {
-        success: boolean;
-        data?: { message?: string };
-        error?: { message?: string };
-      };
-
-      if (res.ok && result.success) {
-        setSuccess(result.data?.message ?? 'Password reset successfully.');
-      } else {
-        setServerError(result.error?.message ?? 'Reset failed.');
-      }
-    } catch {
-      setServerError('An unexpected error occurred.');
-    }
-  };
-
-  if (success) {
-    return (
-      <div className='rounded-lg border border-success-200 bg-success-50 p-6 text-center'>
-        <div className='mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-success-100'>
-          <span className='text-2xl text-success-600'>✓</span>
-        </div>
-        <h2 className='text-xl font-semibold text-success-700'>
-          Password Reset!
-        </h2>
-        <p className='mt-2 text-sm text-default-600'>{success}</p>
-        <Link
-          className='mt-4 inline-block rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90'
-          href='/login'
-        >
-          Go to Login
-        </Link>
+  if (success) return (
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 text-center shadow-lg">
+        <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-emerald-100"><span className="text-2xl text-emerald-600">✓</span></div>
+        <h2 className="text-xl font-semibold text-emerald-700">Password Reset</h2>
+        <p className="mt-2 text-sm text-muted-foreground">{success}</p>
+        <Link className="mt-4 inline-block rounded-md bg-primary px-6 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90" href="/login">Go to Login</Link>
       </div>
-    );
-  }
+    </div>
+  );
 
   return (
-    <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
-      <Input label='New Password' type='password' {...register('password')} />
-      {errors.password && (
-        <p className='text-sm text-danger-600'>{errors.password.message}</p>
-      )}
-
-      <Input label='Confirm New Password' type='password' {...register('confirmPassword')} />
-      {errors.confirmPassword && (
-        <p className='text-sm text-danger-600'>
-          {errors.confirmPassword.message}
-        </p>
-      )}
-
-      {serverError && <p className='text-sm text-danger-600'>{serverError}</p>}
-
-      <Button className='w-full' isLoading={isSubmitting} type='submit'>
-        Reset Password
-      </Button>
-    </form>
+    <div className="flex min-h-screen items-center justify-center px-4">
+      <div className="w-full max-w-md rounded-lg border border-border bg-card p-8 shadow-lg">
+        <h1 className="text-2xl font-bold">Reset Password</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Enter your new password.</p>
+        <form className="mt-6 space-y-4" onSubmit={handleSubmit(onSubmit)}>
+          <Input label="New Password" type="password" {...register('password')} />
+          {errors.password && <p className="text-sm text-destructive">{errors.password.message}</p>}
+          <Input label="Confirm Password" type="password" {...register('confirmPassword')} />
+          {errors.confirmPassword && <p className="text-sm text-destructive">{errors.confirmPassword.message}</p>}
+          {serverError && <p className="text-sm text-destructive">{serverError}</p>}
+          <Button type="submit" disabled={isSubmitting} className="w-full">{isSubmitting ? 'Resetting...' : 'Reset Password'}</Button>
+          <Link className="text-sm text-primary hover:underline" href="/login">← Back to Login</Link>
+        </form>
+      </div>
+    </div>
   );
 }

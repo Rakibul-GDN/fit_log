@@ -1,58 +1,30 @@
 'use client';
 
-import { Input } from '@/components/ui/Input';
-import type { ReactNode } from 'react';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 
-const CATEGORIES = [
-  'All',
-  'BARBELL',
-  'DUMBBELL',
-  'MACHINE',
-  'CABLE',
-  'BODYWEIGHT',
-  'KETTLEBELL',
-  'RESISTANCE_BAND',
-  'OTHER',
-] as const;
-
-/** Search filter props */
-export interface ExerciseSearchFilterProps {
+interface ExerciseSearchFilterProps {
   search: string;
   category: string;
   onSearchChange: (value: string) => void;
   onCategoryChange: (value: string) => void;
 }
 
-/**
- * ExerciseSearchFilter — search input + category dropdown.
- */
-export function ExerciseSearchFilter({
-  search,
-  category,
-  onSearchChange,
-  onCategoryChange,
-}: ExerciseSearchFilterProps): ReactNode {
+export function ExerciseSearchFilter({ search, category, onSearchChange, onCategoryChange }: ExerciseSearchFilterProps) {
+  const categories = ['BARBELL', 'DUMBBELL', 'MACHINE', 'CABLE', 'BODYWEIGHT', 'KETTLEBELL', 'RESISTANCE_BAND', 'OTHER'];
+
   return (
-    <div className='flex flex-col gap-3 sm:flex-row'>
-      <div className='flex-1'>
-        <Input
-          placeholder='Search exercises...'
-          type='search'
-          value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onSearchChange(e.target.value)}
-        />
+    <div className="flex flex-wrap gap-3">
+      <div className="flex-1 min-w-48">
+        <Input placeholder="Search exercises..." value={search} onChange={(e) => onSearchChange(e.target.value)} />
       </div>
-      <select
-        className='rounded-md border border-default-200 bg-card px-3 py-2 text-sm'
-        value={category}
-        onChange={(e) => onCategoryChange(e.target.value)}
-      >
-        {CATEGORIES.map((cat) => (
-          <option key={cat} value={cat === 'All' ? '' : cat}>
-            {cat === 'All' ? 'All Categories' : cat.replace(/_/g, ' ')}
-          </option>
-        ))}
-      </select>
+      <div className="w-48">
+        <Label htmlFor="category">Category</Label>
+        <select id="category" className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={category} onChange={(e) => onCategoryChange(e.target.value)}>
+          <option value="">All categories</option>
+          {categories.map((cat) => <option key={cat} value={cat}>{cat.replace(/_/g, ' ')}</option>)}
+        </select>
+      </div>
     </div>
   );
 }

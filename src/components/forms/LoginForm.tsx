@@ -1,98 +1,59 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
-import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { signIn } from 'next-auth/react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState, type ReactNode } from 'react';
 import Link from 'next/link';
 
-const loginSchema = z.object({
-  email: z.email(),
-  password: z.string().min(1, 'Password is required.'),
-});
-
+const loginSchema = z.object({ email: z.email(), password: z.string().min(1) });
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-/**
- * Login form with validation and NextAuth credentials login.
- */
-export function LoginForm(): React.ReactElement {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get('callbackUrl') ?? '/';
-
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormValues>({
-    resolver: zodResolver(loginSchema),
-  });
-
+export function LoginForm(): ReactNode {
+  const { register, handleSubmit, formState: { errors } } = useForm<LoginFormValues>({ resolver: zodResolver(loginSchema) });
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const onSubmit = async (data: LoginFormValues): Promise<void> => {
+    setIsSubmitting(true);
     setServerError(null);
-
-    const result = await signIn('credentials', {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
-
-    if (result?.error) {
-      setServerError('Invalid email or password. Please try again.');
-      return;
+    try {
+      const res = await fetch('/api/auth/callback/credentials', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        redirect: 'manual',
+      });
+      if (res.ok || res.status === 302) {
+        window.location.href = '/';
+      } else {
+        setServerError('Invalid email or password.');
+      }
+    } catch {
+      setServerError('An unexpected error occurred.');
+    } finally {
+      setIsSubmitting(false);
     }
-
-    router.push(callbackUrl);
-    router.refresh();
   };
 
   return (
-    <form className='space-y-4' onSubmit={handleSubmit(onSubmit)}>
-      <Input
-        
-        label='Email'
-        type='email'
-        {...register('email')}
-      />
-      {errors.email && (
-        <p className='text-sm text-danger-600'>{errors.email.message}</p>
-      )}
-
-      <Input
-        
-        label='Password'
-        type='password'
-        {...register('password')}
-      />
-      {errors.password && (
-        <p className='text-sm text-danger-600'>{errors.password.message}</p>
-      )}
-
-      {serverError && (
-        <div className='text-sm text-danger-600'>
-          <p>{serverError}</p>
-          <p className='mt-1'>
-            If you just registered, please check your email (including spam)
-            to verify your account first.
-          </p>
-        </div>
-      )}
-
-      <div className='flex items-center justify-end'>
-        <Link className='text-sm text-primary hover:underline' href='/reset-password'>
-          Forgot Password?
-        </Link>
+    <form className="space-y-4" onSubmit={handleSubmit(onSubmit)}>
+      <div>
+        <Input label="Email" type="email" placeholder="your@email.com" {...register('email')} />
+        {errors.email && <p className="mt-1 text-sm text-destructive">{errors.email.message}</p>}
       </div>
-
-      <Button className='w-full' isLoading={isSubmitting} type='submit'>
-        Sign In
+      <div>
+        <Input label="Password" type="password" placeholder="••••••••" {...register('password')} />
+        {errors.password && <p className="mt-1 text-sm text-destructive">{errors.password.message}</p>}
+      </div>
+      {serverError && <p className="text-sm text-destructive">{serverError}</p>}
+      <div className="text-right">
+        <Link className="text-sm text-primary hover:underline" href="/forgot-password">Forgot Password?</Link>
+      </div>
+      <Button className="w-full" disabled={isSubmitting} type="submit">
+        {isSubmitting ? 'Signing in...' : 'Sign In'}
       </Button>
     </form>
   );

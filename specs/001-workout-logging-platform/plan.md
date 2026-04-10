@@ -236,7 +236,8 @@ fit_log/
 |---|-------|--------|----------|
 | T1 | **GET `/api/routines` returns 500** — `deletedAt` column in Prisma schema but not in DB. Reverted from schema. **User must restart dev server + run `npx prisma generate`** for Prisma client to pick up the change. | **In Progress** (waiting for server restart) | 2026-04-09 |
 | T2 | **"Create Routine" button does nothing** — `Button as={Link}` not working with HeroUI v3. Replaced all `Button as={Link}` instances with plain `<Link>` tags across routines, workouts, exercises, and routine detail pages (6 occurrences fixed). | **Fixed** | 2026-04-09 |
-| T3 | **Polish design — rebuild dashboard layout** with fixed left sidebar (240px collapsible), top header bar (search, notifications, avatar), KPI stat cards, DataTable component with row hover/click, breadcrumbs, CTA buttons, quick actions grid, mobile-responsive drawer. All using Tailwind + minimal HeroUI. | **Fixed** | 2026-04-09 |
+| T3 | **Polish design — rebuild dashboard layout** with fixed left sidebar, top header bar, KPI stat cards, DataTable, breadcrumbs, CTA buttons, mobile drawer. | **Fixed** | 2026-04-09 |
+| T4 | **Migrate from HeroUI v3 → shadcn/ui** — full redesign complete. Removed HeroUI, installed shadcn dependencies (Radix primitives, CVA, lucide-react), configured Tailwind with CSS variables, created 14 shadcn UI components, rewrote all pages/forms with shadcn classes, replaced HeroUI color tokens with shadcn equivalents. **0 TS errors, 120 tests pass, build passes with 30 pages.** | **Fixed** | 2026-04-09 |
 
 ### Critical Bugs (Must Fix Before Production)
 
