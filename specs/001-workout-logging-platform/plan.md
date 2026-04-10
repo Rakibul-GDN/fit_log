@@ -304,6 +304,83 @@ fit_log/
 | I9 | Add keyboard shortcuts (Ctrl+S to save forms, Escape to close modals) | Power user productivity |
 | I10 | Add `next/image` for any future image assets | Performance and layout shift prevention |
 
+## UI Redesign: shadcn/ui Blocks Migration
+
+**Date**: 2026-04-10
+**Status**: Planned
+**Objective**: Replace current shadcn/ui components with premium shadcn blocks for a more polished, modern, and visually appealing dashboard experience.
+
+### Scope
+
+The following areas will be redesigned using shadcn blocks:
+
+1. **Dashboard Layout** — Modern admin panel with fixed sidebar, top header bar, KPI cards, data tables, breadcrumbs
+2. **Authentication Pages** — Beautiful login/register forms with proper spacing and branding
+3. **Data Tables** — Enhanced tables with pagination, sorting, filtering, and actions
+4. **Cards & Stats** — Modern stat cards, routine cards, progress summaries
+5. **Forms** — Polished form layouts with proper validation states and UX patterns
+6. **Navigation** — Improved sidebar with collapsible sections, active state highlighting, and icons
+7. **Settings Page** — Modern settings layout with tabs/sections
+
+### Benefits
+
+- **Consistency**: All components follow the same design language
+- **Responsive**: Built-in mobile-first responsive patterns
+- **Accessible**: Proper ARIA attributes and keyboard navigation
+- **Customizable**: Easy to theme with our CSS variables
+- **Production-Ready**: Tested and optimized components
+
+### Implementation Strategy
+
+1. **Phase 1**: Audit current components and identify which can be replaced with blocks
+2. **Phase 2**: Update dashboard layout and navigation (highest visual impact)
+3. **Phase 3**: Migrate auth pages, settings, and data tables
+4. **Phase 4**: Polish and refine forms, cards, and stat displays
+5. **Phase 5**: Final visual QA and responsive testing
+
+### Risks & Mitigations
+
+| Risk | Impact | Mitigation |
+|------|--------|------------|
+| Breaking changes in existing pages | High | Test each page after migration |
+| Custom styling overrides needed | Medium | Plan for component-level CSS customizations |
+| Bundle size increase | Low | Tree-shakeable imports, audit after migration |
+
+### Success Criteria
+
+- All pages use shadcn blocks instead of custom components
+- Visual consistency across all dashboard sections
+- Mobile responsiveness maintained or improved
+- No regressions in functionality or tests
+- Improved visual appeal and modern look
+
+## Bug Fixes: Authentication CSRF Error
+
+**Date**: 2026-04-10
+**Status**: ✅ **RESOLVED**
+**Issue**: `MissingCSRF: CSRF token was missing during an action callback` when attempting to login
+**Impact**: Users cannot sign in to the application
+**Root Cause**: LoginForm was manually calling `/api/auth/callback/credentials` with `fetch()` instead of using NextAuth's `signIn()` function
+
+### Fix Applied
+
+1. ✅ Updated `LoginForm` to use `signIn('credentials', {...})` from `next-auth/react`
+2. ✅ Added `secret: process.env.NEXTAUTH_SECRET` to NextAuth config
+3. ✅ Removed manual `fetch()` call that bypassed CSRF protection
+
+### Files Changed
+
+- `src/components/forms/LoginForm.tsx` — Replaced `fetch()` with `signIn()` function
+- `src/lib/services/auth.ts` — Added `secret` property to config
+
+### Success Criteria
+
+- ✅ Users can log in without CSRF errors
+- ✅ Login form submits successfully and redirects to dashboard
+- ✅ No CSRF errors in server logs
+- ✅ All 120 tests pass
+- ✅ Build passes with 0 errors
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**

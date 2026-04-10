@@ -54,9 +54,11 @@ describe('Routines API Contract Tests', () => {
         ],
         pagination: {
           page: 1,
-          pageSize: 20,
-          totalItems: 1,
+          limit: 20,
+          total: 1,
           totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
         },
       };
 

@@ -11,9 +11,11 @@ export interface PaginatedResponse<T = unknown> {
   data: T[];
   pagination: {
     page: number;
-    pageSize: number;
-    totalItems: number;
+    limit: number;
+    total: number;
     totalPages: number;
+    hasNext: boolean;
+    hasPrev: boolean;
   };
 }
 

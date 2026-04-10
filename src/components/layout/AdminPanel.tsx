@@ -1,9 +1,8 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState } from 'react';
 import Link from 'next/link';
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import {
   LayoutDashboard,
   ListTodo,
@@ -142,7 +141,7 @@ interface AdminPanelProps {
 }
 
 export function AdminPanel({
-  children, activePath = '/', title, breadcrumb,
+  children, activePath, title, breadcrumb,
   collapsed = false, onToggleCollapse, onMobileMenuOpen,
   mobileMenuOpen = false, onCloseMobileMenu, ctaButton, onSignOut,
 }: AdminPanelProps): ReactNode {

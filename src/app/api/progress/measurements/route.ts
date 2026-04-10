@@ -16,18 +16,18 @@ export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const pagination = paginationSchema.safeParse({
     page: searchParams.get('page') ?? '1',
-    pageSize: searchParams.get('pageSize') ?? '20',
+    limit: searchParams.get('limit') ?? '20',
   });
 
   const page = pagination.success ? pagination.data.page : 1;
-  const pageSize = pagination.success ? pagination.data.pageSize : 20;
+  const limit = pagination.success ? pagination.data.limit : 20;
 
-  const [measurements, totalItems] = await Promise.all([
+  const [measurements, total] = await Promise.all([
     prisma.bodyMeasurement.findMany({
       where: { userId: session.user.id },
       orderBy: { measurementDate: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      skip: (page - 1) * limit,
+      take: limit,
     }),
     prisma.bodyMeasurement.count({ where: { userId: session.user.id } }),
   ]);
@@ -37,9 +37,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     data: measurements,
     pagination: {
       page,
-      pageSize,
-      totalItems,
-      totalPages: Math.ceil(totalItems / pageSize),
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page < Math.ceil(total / limit),
+      hasPrev: page > 1,
     },
   });
 }

@@ -16,11 +16,11 @@ export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const pagination = paginationSchema.safeParse({
     page: searchParams.get('page') ?? '1',
-    pageSize: searchParams.get('pageSize') ?? '20',
+    limit: searchParams.get('limit') ?? '20',
   });
 
   const page = pagination.success ? pagination.data.page : 1;
-  const pageSize = pagination.success ? pagination.data.pageSize : 20;
+  const limit = pagination.success ? pagination.data.limit : 20;
 
   const fromDate = searchParams.get('fromDate');
   const toDate = searchParams.get('toDate');
@@ -32,12 +32,12 @@ export async function GET(request: Request): Promise<NextResponse> {
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
   if (toDate) where.workoutDate = { ...where.workoutDate, lte: new Date(toDate) };
 
-  const [workouts, totalItems] = await Promise.all([
+  const [workouts, total] = await Promise.all([
     prisma.workoutLog.findMany({
       where,
       orderBy: { workoutDate: 'desc' },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      skip: (page - 1) * limit,
+      take: limit,
       include: {
         logEntries: {
           include: { exercise: { select: { id: true, name: true } } },
@@ -52,9 +52,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     data: workouts,
     pagination: {
       page,
-      pageSize,
-      totalItems,
-      totalPages: Math.ceil(totalItems / pageSize),
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page < Math.ceil(total / limit),
+      hasPrev: page > 1,
     },
   });
 }

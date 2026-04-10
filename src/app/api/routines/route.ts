@@ -16,26 +16,26 @@ export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const pagination = paginationSchema.safeParse({
     page: searchParams.get('page') ?? '1',
-    pageSize: searchParams.get('pageSize') ?? '20',
+    limit: searchParams.get('limit') ?? '20',
   });
 
   const page = pagination.success ? pagination.data.page : 1;
-  const pageSize = pagination.success ? pagination.data.pageSize : 20;
+  const limit = pagination.success ? pagination.data.limit : 20;
 
   try {
-    const [routines, totalItems] = await Promise.all([
+    const [routines, total] = await Promise.all([
       prisma.routine.findMany({
-        where: { userId: session.user.id },
+        where: { userId: session.user.id, deletedAt: null },
         orderBy: { updatedAt: 'desc' },
-        skip: (page - 1) * pageSize,
-        take: pageSize,
+        skip: (page - 1) * limit,
+        take: limit,
         include: {
           exerciseAssignments: {
             include: { exercise: { select: { id: true, name: true, category: true } } },
           },
         },
       }),
-      prisma.routine.count({ where: { userId: session.user.id } }),
+      prisma.routine.count({ where: { userId: session.user.id, deletedAt: null } }),
     ]);
 
     return NextResponse.json({
@@ -43,9 +43,11 @@ export async function GET(request: Request): Promise<NextResponse> {
       data: routines,
       pagination: {
         page,
-        pageSize,
-        totalItems,
-        totalPages: Math.ceil(totalItems / pageSize),
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
+        hasNext: page < Math.ceil(total / limit),
+        hasPrev: page > 1,
       },
     });
   } catch (error) {

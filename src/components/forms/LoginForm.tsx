@@ -1,11 +1,12 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useState, type ReactNode } from 'react';
+import { signIn } from 'next-auth/react';
 import Link from 'next/link';
 
 const loginSchema = z.object({ email: z.email(), password: z.string().min(1) });
@@ -20,13 +21,15 @@ export function LoginForm(): ReactNode {
     setIsSubmitting(true);
     setServerError(null);
     try {
-      const res = await fetch('/api/auth/callback/credentials', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-        redirect: 'manual',
+      const result = await signIn('credentials', {
+        email: data.email,
+        password: data.password,
+        redirect: false,
       });
-      if (res.ok || res.status === 302) {
+
+      if (result?.error) {
+        setServerError('Invalid email or password.');
+      } else if (result?.ok) {
         window.location.href = '/';
       } else {
         setServerError('Invalid email or password.');

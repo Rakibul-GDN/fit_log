@@ -1,7 +1,5 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { RoutineForm, type RoutineFormValues } from '@/components/forms/RoutineForm';
 import { useCreateRoutine } from '@/hooks/api/useRoutines';
 import { useExercises } from '@/hooks/api/useExercises';

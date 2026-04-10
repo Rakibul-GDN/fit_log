@@ -7,12 +7,12 @@ import type { PaginatedResponse, SuccessResponse } from '@/types/api';
 /** Fetch exercises list with optional filters */
 async function fetchExercises(
   page: number,
-  pageSize: number,
+  limit: number,
   search?: string,
   category?: string,
 ): Promise<PaginatedResponse<Exercise>> {
   const { data } = await apiClient.get<PaginatedResponse<Exercise>>('/exercises', {
-    params: { page, pageSize, search, category },
+    params: { page, limit, search, category },
   });
   return data;
 }
@@ -28,13 +28,13 @@ async function createExercise(
 /** Query hook: List exercises with optional filters */
 export function useExercises(
   page = 1,
-  pageSize = 20,
+  limit = 20,
   search?: string,
   category?: string,
 ) {
   return useQuery({
-    queryKey: ['exercises', page, pageSize, search, category],
-    queryFn: () => fetchExercises(page, pageSize, search, category),
+    queryKey: ['exercises', page, limit, search, category],
+    queryFn: () => fetchExercises(page, limit, search, category),
   });
 }
 

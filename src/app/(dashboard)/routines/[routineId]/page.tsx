@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { RoutineWeekView } from '@/components/layout/RoutineWeekView';
 import { useRoutine, useDeleteRoutine } from '@/hooks/api/useRoutines';
 import { useParams, useRouter } from 'next/navigation';

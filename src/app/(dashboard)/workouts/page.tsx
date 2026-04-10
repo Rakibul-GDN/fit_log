@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useWorkouts } from '@/hooks/api/useWorkouts';
 import { WorkoutListSkeleton } from '@/components/feedback/ListSkeletons';
 import { WorkoutHistoryCard } from '@/components/layout/WorkoutHistoryCard';

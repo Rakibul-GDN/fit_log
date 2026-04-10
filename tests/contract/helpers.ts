@@ -31,9 +31,11 @@ export function paginatedResponseValidator<T>(itemSchema: z.ZodType<T>) {
     data: z.array(itemSchema),
     pagination: z.object({
       page: z.number(),
-      pageSize: z.number(),
-      totalItems: z.number(),
+      limit: z.number(),
+      total: z.number(),
       totalPages: z.number(),
+      hasNext: z.boolean(),
+      hasPrev: z.boolean(),
     }),
   });
 }

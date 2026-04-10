@@ -36,9 +36,11 @@ describe('Exercises API Contract Tests', () => {
         ],
         pagination: {
           page: 1,
-          pageSize: 20,
-          totalItems: 1,
+          limit: 20,
+          total: 1,
           totalPages: 1,
+          hasNext: false,
+          hasPrev: false,
         },
       };
 
@@ -53,7 +55,7 @@ describe('Exercises API Contract Tests', () => {
       const mockResponse = {
         success: true,
         data: [],
-        pagination: { page: 1, pageSize: 20, totalItems: 0, totalPages: 0 },
+        pagination: { page: 1, limit: 20, total: 0, totalPages: 0, hasNext: false, hasPrev: false },
       };
 
       const result = schema.safeParse(mockResponse);

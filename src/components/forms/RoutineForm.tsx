@@ -1,8 +1,14 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -90,13 +96,30 @@ export function RoutineForm({ defaultValues, exercises = [], onSubmit, isSubmitt
         <div className="mt-3 space-y-2 rounded border p-3">
           <p className="text-sm font-medium">Add Exercise</p>
           <div className="flex flex-wrap gap-2">
-            <select className="flex-1 rounded border border-border bg-background p-2 text-sm" value={selectedExercise} onChange={(e) => setSelectedExercise(e.target.value)}>
-              <option value="">Select exercise</option>
-              {exercises.map((ex) => <option key={ex.id} value={ex.id}>{ex.name} ({ex.category.replace(/_/g, ' ')})</option>)}
-            </select>
-            <select className="w-36 rounded border border-border bg-background p-2 text-sm" value={selectedDay} onChange={(e) => setSelectedDay(e.target.value as typeof DAYS[number])}>
-              {DAYS.map((day) => <option key={day} value={day}>{day.charAt(0) + day.slice(1).toLowerCase()}</option>)}
-            </select>
+            <Select value={selectedExercise} onValueChange={setSelectedExercise}>
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Select exercise" />
+              </SelectTrigger>
+              <SelectContent>
+                {exercises.map((ex) => (
+                  <SelectItem key={ex.id} value={ex.id}>
+                    {ex.name} ({ex.category.replace(/_/g, ' ')})
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={selectedDay} onValueChange={(v) => setSelectedDay(v as typeof DAYS[number])}>
+              <SelectTrigger className="w-36">
+                <SelectValue placeholder="Select day" />
+              </SelectTrigger>
+              <SelectContent>
+                {DAYS.map((day) => (
+                  <SelectItem key={day} value={day}>
+                    {day.charAt(0) + day.slice(1).toLowerCase()}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
             <Button type="button" onClick={addAssignment} disabled={!selectedExercise} size="sm">Add</Button>
           </div>
         </div>

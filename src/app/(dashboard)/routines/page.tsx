@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { RoutineCard } from '@/components/ui/routine-card';
 import { RoutineListSkeleton } from '@/components/feedback/ListSkeletons';
 import { useRoutines, useDeleteRoutine } from '@/hooks/api/useRoutines';
@@ -42,7 +42,8 @@ export default function RoutinesPage(): React.ReactElement {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data?.data?.map((routine) => {
-          const exerciseCount = (routine as { exerciseAssignments?: unknown[] }).exerciseAssignments?.length ?? 0;
+          const routineWithAssignments = routine as { exerciseAssignments?: { exerciseId: string; dayOfWeek: string }[] };
+          const exerciseCount = routineWithAssignments.exerciseAssignments?.length ?? 0;
           return (
             <RoutineCard key={routine.id} description={routine.description ?? null} exerciseCount={exerciseCount} id={routine.id} name={routine.name} onDelete={() => void handleDelete(routine.id)} />
           );

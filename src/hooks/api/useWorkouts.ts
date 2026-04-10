@@ -7,12 +7,12 @@ import type { PaginatedResponse, SuccessResponse } from '@/types/api';
 /** Fetch workouts list with optional date filter */
 async function fetchWorkouts(
   page: number,
-  pageSize: number,
+  limit: number,
   fromDate?: string,
   toDate?: string,
 ): Promise<PaginatedResponse<WorkoutLog>> {
   const { data } = await apiClient.get<PaginatedResponse<WorkoutLog>>('/workouts', {
-    params: { page, pageSize, fromDate, toDate },
+    params: { page, limit, fromDate, toDate },
   });
   return data;
 }
@@ -46,10 +46,10 @@ async function deleteWorkout(workoutId: string): Promise<void> {
 }
 
 /** Query hook: List workouts */
-export function useWorkouts(page = 1, pageSize = 20, fromDate?: string, toDate?: string) {
+export function useWorkouts(page = 1, limit = 20, fromDate?: string, toDate?: string) {
   return useQuery({
-    queryKey: ['workouts', page, pageSize, fromDate, toDate],
-    queryFn: () => fetchWorkouts(page, pageSize, fromDate, toDate),
+    queryKey: ['workouts', page, limit, fromDate, toDate],
+    queryFn: () => fetchWorkouts(page, limit, fromDate, toDate),
   });
 }
 

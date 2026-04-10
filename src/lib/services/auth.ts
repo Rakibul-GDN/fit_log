@@ -24,25 +24,38 @@ export const authConfig = {
       },
       authorize: async (credentials) => {
         const parsed = authSchema.safeParse(credentials);
-        if (!parsed.success) return null;
+        if (!parsed.success) {
+          console.error('[Auth] Parse error:', parsed.error.format());
+          return null;
+        }
 
         const db = await getPrisma();
         const user = await db.user.findUnique({
           where: { email: parsed.data.email },
         });
 
-        if (!user) return null;
+        if (!user) {
+          console.error('[Auth] User not found:', parsed.data.email);
+          return null;
+        }
 
         const passwordMatch = await bcrypt.compare(
           parsed.data.password,
           user.passwordHash,
         );
 
-        if (!passwordMatch) return null;
+        if (!passwordMatch) {
+          console.error('[Auth] Password mismatch for:', parsed.data.email);
+          return null;
+        }
 
         // Block login if email is not verified
-        if (!user.emailVerified) return null;
+        if (!user.emailVerified) {
+          console.error('[Auth] Email not verified for:', parsed.data.email);
+          return null;
+        }
 
+        console.log('[Auth] Login successful for:', parsed.data.email);
         return {
           id: user.id,
           email: user.email,
@@ -83,6 +96,7 @@ export const authConfig = {
   session: {
     strategy: 'jwt' as const,
   },
+  secret: process.env.NEXTAUTH_SECRET,
 };
 
 /** NextAuth instance — used by route handler */

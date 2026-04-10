@@ -5,9 +5,9 @@ import type { Routine } from '@/types/entities';
 import type { PaginatedResponse, SuccessResponse } from '@/types/api';
 
 /** Fetch routines list */
-async function fetchRoutines(page: number, pageSize: number): Promise<PaginatedResponse<Routine>> {
+async function fetchRoutines(page: number, limit: number): Promise<PaginatedResponse<Routine>> {
   const { data } = await apiClient.get<PaginatedResponse<Routine>>('/routines', {
-    params: { page, pageSize },
+    params: { page, limit },
   });
   return data;
 }
@@ -41,10 +41,10 @@ async function deleteRoutine(routineId: string): Promise<void> {
 }
 
 /** Query hook: List routines */
-export function useRoutines(page = 1, pageSize = 20) {
+export function useRoutines(page = 1, limit = 20) {
   return useQuery({
-    queryKey: ['routines', page, pageSize],
-    queryFn: () => fetchRoutines(page, pageSize),
+    queryKey: ['routines', page, limit],
+    queryFn: () => fetchRoutines(page, limit),
   });
 }
 

@@ -1,8 +1,15 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/Button';
+import { Input } from '@/components/ui/Input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { useExercises } from '@/hooks/api/useExercises';
 import { useState, type ReactNode } from 'react';
 
@@ -50,9 +57,18 @@ export function WorkoutLogForm({ defaultEntries = [], defaultDayOfWeek = 'MONDAY
       <div className="grid grid-cols-2 gap-3">
         <div>
           <Label htmlFor="dayOfWeek">Day of Week</Label>
-          <select id="dayOfWeek" className="mt-1 w-full rounded-md border border-input bg-background px-3 py-2 text-sm" value={dayOfWeek} onChange={(e) => setDayOfWeek(e.target.value)}>
-            {DAYS.map((d) => <option key={d} value={d}>{d.charAt(0) + d.slice(1).toLowerCase()}</option>)}
-          </select>
+          <Select value={dayOfWeek} onValueChange={setDayOfWeek}>
+            <SelectTrigger className="mt-1">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {DAYS.map((d) => (
+                <SelectItem key={d} value={d}>
+                  {d.charAt(0) + d.slice(1).toLowerCase()}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <Label htmlFor="workoutDate">Date</Label>
@@ -69,10 +85,25 @@ export function WorkoutLogForm({ defaultEntries = [], defaultDayOfWeek = 'MONDAY
           <div key={i} className="rounded-lg border bg-card p-4">
             <div className="mb-3 flex items-start gap-2">
               <span className="mt-2 text-sm font-medium text-muted-foreground">#{i + 1}</span>
-              <select className="flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm" value={entry.exerciseId} onChange={(e) => { const ex = exercises.find((x) => x.id === e.target.value); updateEntry(i, 'exerciseId', e.target.value); if (ex) updateEntry(i, 'exerciseName', ex.name); }}>
-                <option value="">Select exercise</option>
-                {exercises.map((ex) => <option key={ex.id} value={ex.id}>{ex.name}</option>)}
-              </select>
+              <Select
+                value={entry.exerciseId}
+                onValueChange={(v) => {
+                  const ex = exercises.find((x) => x.id === v);
+                  updateEntry(i, 'exerciseId', v);
+                  if (ex) updateEntry(i, 'exerciseName', ex.name);
+                }}
+              >
+                <SelectTrigger className="flex-1">
+                  <SelectValue placeholder="Select exercise" />
+                </SelectTrigger>
+                <SelectContent>
+                  {exercises.map((ex) => (
+                    <SelectItem key={ex.id} value={ex.id}>
+                      {ex.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               {entries.length > 1 && <Button variant="destructive" size="sm" onClick={() => removeExercise(i)}>×</Button>}
             </div>
             <div className="grid grid-cols-3 gap-3">

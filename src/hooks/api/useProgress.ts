@@ -38,10 +38,10 @@ async function fetchProgress(
 /** Fetch body measurements (paginated) */
 async function fetchMeasurements(
   page: number,
-  pageSize: number,
+  limit: number,
 ): Promise<PaginatedResponse<BodyMeasurement>> {
   const { data } = await apiClient.get<PaginatedResponse<BodyMeasurement>>('/progress/measurements', {
-    params: { page, pageSize },
+    params: { page, limit },
   });
   return data;
 }
@@ -80,10 +80,10 @@ export function useProgress(exerciseId?: string, range = '90') {
 }
 
 /** Query hook: List body measurements */
-export function useMeasurements(page = 1, pageSize = 20) {
+export function useMeasurements(page = 1, limit = 20) {
   return useQuery({
-    queryKey: ['measurements', page, pageSize],
-    queryFn: () => fetchMeasurements(page, pageSize),
+    queryKey: ['measurements', page, limit],
+    queryFn: () => fetchMeasurements(page, limit),
   });
 }
 

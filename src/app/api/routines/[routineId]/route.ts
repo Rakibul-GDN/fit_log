@@ -84,16 +84,29 @@ export async function PATCH(
 
   const { name, description, assignments } = validation.data;
 
-  // Update routine and replace assignments
-  const routine = await prisma.routine.update({
-    where: { id: routineId },
-    data: {
-      ...(name && { name }),
-      ...(description !== undefined && { description }),
-      ...(assignments && {
-        exerciseAssignments: {
-          deleteMany: {},
-          create: assignments.map((a) => ({
+  // Update routine with partial data
+  const routine = await prisma.$transaction(async (tx) => {
+    // Update basic fields
+    const updated = await tx.routine.update({
+      where: { id: routineId },
+      data: {
+        ...(name && { name }),
+        ...(description !== undefined && { description }),
+      },
+    });
+
+    // Partial update assignments if provided
+    if (assignments) {
+      // Delete removed assignments
+      await tx.exerciseAssignment.deleteMany({
+        where: { routineId },
+      });
+
+      // Create new assignments
+      if (assignments.length > 0) {
+        await tx.exerciseAssignment.createMany({
+          data: assignments.map((a) => ({
+            routineId,
             exerciseId: a.exerciseId,
             dayOfWeek: a.dayOfWeek,
             defaultSets: a.defaultSets,
@@ -101,15 +114,20 @@ export async function PATCH(
             defaultWeight: a.defaultWeight,
             order: a.order,
           })),
+        });
+      }
+    }
+
+    // Fetch updated routine with assignments
+    return tx.routine.findUnique({
+      where: { id: routineId },
+      include: {
+        exerciseAssignments: {
+          include: { exercise: { select: { id: true, name: true, category: true } } },
+          orderBy: { order: 'asc' },
         },
-      }),
-    },
-    include: {
-      exerciseAssignments: {
-        include: { exercise: { select: { id: true, name: true, category: true } } },
-        orderBy: { order: 'asc' },
       },
-    },
+    });
   });
 
   return NextResponse.json({ success: true, data: routine });
@@ -142,7 +160,10 @@ export async function DELETE(
     );
   }
 
-  await prisma.routine.delete({ where: { id: routineId } });
+  await prisma.routine.update({
+    where: { id: routineId },
+    data: { deletedAt: new Date() },
+  });
 
   return NextResponse.json({
     success: true,

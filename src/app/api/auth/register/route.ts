@@ -36,7 +36,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         {
           success: false,
           error: {
-            code: 'EMAIL_EXISTS',
+            code: 'CONFLICT',
             message: 'An account with this email already exists.',
           },
         },
@@ -64,12 +64,13 @@ export async function POST(request: Request): Promise<NextResponse> {
       {
         success: true,
         data: {
-          userId: user.id,
+          id: user.id,
           email: user.email,
+          name: user.name,
+          emailVerified: user.emailVerified,
           message: emailResult.success
-            ? 'Registration successful. Please check your email for verification.'
+            ? 'Account created. Please check your email to verify your account.'
             : 'Account created but we could not send the verification email. Please try resending it from the verify email page.',
-          emailSent: emailResult.success,
         },
       },
       { status: 201 },

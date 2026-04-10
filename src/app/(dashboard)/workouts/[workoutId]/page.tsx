@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { useWorkout, useDeleteWorkout } from '@/hooks/api/useWorkouts';
 import { useParams, useRouter } from 'next/navigation';
 
@@ -29,7 +29,7 @@ export default function WorkoutDetailPage(): React.ReactElement {
         <Button variant="destructive" onClick={async () => { if (confirm('Delete this workout?')) { await deleteMutation.mutateAsync(workoutId); router.push('/workouts'); } }}>Delete</Button>
       </div>
 
-      {workout.notes && <div className="mb-6 rounded-lg bg-muted p-4 text-sm text-foreground">{workout.notes as string}</div>}
+      {workout.notes && <div className="mb-6 rounded-lg bg-muted p-4 text-sm text-foreground">{workout.notes}</div>}
 
       <div className="space-y-4">
         {entries.map((entry) => (

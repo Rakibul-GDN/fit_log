@@ -98,12 +98,13 @@ model VerificationToken {
 }
 
 model Routine {
-  id          String   @id @default(uuid())
+  id          String    @id @default(uuid())
   userId      String
-  name        String   @db.VarChar(100)
-  description String?  @db.VarChar(500)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  name        String    @db.VarChar(100)
+  description String?   @db.VarChar(500)
+  deletedAt   DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
 
   user               User                @relation(fields: [userId], references: [id], onDelete: Cascade)
   exerciseAssignments ExerciseAssignment[]
@@ -111,17 +112,19 @@ model Routine {
 
   @@unique([userId, name])
   @@index([userId])
+  @@index([deletedAt])
 }
 
 model Exercise {
-  id               String           @id @default(uuid())
-  name             String           @db.VarChar(100)
-  description      String?          @db.VarChar(500)
+  id               String    @id @default(uuid())
+  name             String    @db.VarChar(100)
+  description      String?   @db.VarChar(500)
   category         ExerciseCategory
   primaryMuscles   String[]
-  isSystemExercise Boolean          @default(false)
+  isSystemExercise Boolean   @default(false)
   createdById      String?
-  createdAt        DateTime         @default(now())
+  deletedAt        DateTime?
+  createdAt        DateTime  @default(now())
 
   createdBy         User?                @relation("UserCustomExercises", fields: [createdById], references: [id])
   exerciseAssignments ExerciseAssignment[]
@@ -130,6 +133,7 @@ model Exercise {
   @@unique([name, createdById])
   @@index([isSystemExercise])
   @@index([createdById])
+  @@index([deletedAt])
 }
 
 model ExerciseAssignment {
@@ -188,7 +192,7 @@ model BodyMeasurement {
   measurementType  MeasurementType
   value            Float
   unit             MeasurementUnit
-  measurementDate  DateTime
+  measurementDate  DateTime         @default(now())
   notes            String?          @db.VarChar(500)
   createdAt        DateTime         @default(now())
 

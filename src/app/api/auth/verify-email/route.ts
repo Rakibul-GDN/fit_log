@@ -31,7 +31,7 @@ export async function POST(request: Request): Promise<NextResponse> {
         {
           success: false,
           error: {
-            code: 'INVALID_TOKEN',
+            code: 'VALIDATION_ERROR',
             message: 'Invalid or expired verification token.',
           },
         },
@@ -48,6 +48,7 @@ export async function POST(request: Request): Promise<NextResponse> {
     return NextResponse.json({
       success: true,
       data: {
+        verified: true,
         message: 'Email verified successfully. You can now log in.',
       },
     });

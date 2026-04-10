@@ -1,6 +1,6 @@
 'use client';
 
-import { KPIGrid, DataTable, Chip, KPIItem } from '@/components/layout/AdminPanel';
+import { KPIGrid, DataTable, Chip, type KPIItem } from '@/components/layout/AdminPanel';
 import { useWorkouts } from '@/hooks/api/useWorkouts';
 import { useRoutines } from '@/hooks/api/useRoutines';
 import { useRouter } from 'next/navigation';
@@ -19,7 +19,7 @@ export default function DashboardPage(): React.ReactElement {
 
   // Compute KPIs from real data
   const kpis = useMemo<KPIItem[]>(() => {
-    const totalWorkouts = workoutsData?.pagination?.totalItems ?? 0;
+    const totalWorkouts = workoutsData?.pagination?.total ?? 0;
     const thisWeek = workouts.filter((w) => {
       const d = new Date(w.workoutDate);
       const now = new Date();
@@ -41,7 +41,7 @@ export default function DashboardPage(): React.ReactElement {
       { label: 'Avg Volume', value: `${(avgVolume / 1000).toFixed(1)}k kg`, trend: '—', up: false },
       { label: 'Active Routines', value: String(activeRoutines), trend: '—', up: false },
     ];
-  }, [workouts, routines, workoutsData?.pagination?.totalItems]);
+  }, [workouts, routines, workoutsData?.pagination?.total]);
 
   // Map real workouts to table rows
   const workoutRows = workouts.map((w) => {
@@ -120,7 +120,7 @@ export default function DashboardPage(): React.ReactElement {
                 if (key === 'status') return <Chip color="success">completed</Chip>;
                 return null;
               }}
-              onRowClick={(row) => router.push(`/workouts/${row.id}`)}
+              onRowClick={(row) => router.push(`/workouts/${String(row.id)}`)}
             />
           )}
         </div>
@@ -156,7 +156,7 @@ export default function DashboardPage(): React.ReactElement {
                 if (key === 'actions') return (
                   <Link
                     className="text-sm font-medium text-primary hover:underline"
-                    href={`/routines/${row.id}/quick-log`}
+                    href={`/routines/${String(row.id)}/quick-log`}
                     onClick={(e) => e.stopPropagation()}
                   >
                     Quick Log →
@@ -164,7 +164,7 @@ export default function DashboardPage(): React.ReactElement {
                 );
                 return null;
               }}
-              onRowClick={(row) => router.push(`/routines/${row.id}`)}
+              onRowClick={(row) => router.push(`/routines/${String(row.id)}`)}
             />
           )}
         </div>

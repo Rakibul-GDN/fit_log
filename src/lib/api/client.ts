@@ -1,4 +1,4 @@
-import type { InternalAxiosRequestConfig, AxiosResponse, AxiosError } from 'axios';
+import type { AxiosResponse, AxiosError } from 'axios';
 import axios from 'axios';
 
 const apiClient = axios.create({
@@ -9,16 +9,7 @@ const apiClient = axios.create({
   timeout: 15000,
 });
 
-/** Request interceptor: attach auth token if available */
-apiClient.interceptors.request.use(
-  (config: InternalAxiosRequestConfig): InternalAxiosRequestConfig => {
-    // Token will be injected once NextAuth session integration is wired
-    return config;
-  },
-  (error: AxiosError): Promise<never> => Promise.reject(error),
-);
-
-/** Response interceptor: unwrap envelope, transform errors */
+/** Response interceptor: transform errors into consistent format */
 apiClient.interceptors.response.use(
   (response: AxiosResponse): AxiosResponse => response,
   (error: AxiosError): Promise<never> => {

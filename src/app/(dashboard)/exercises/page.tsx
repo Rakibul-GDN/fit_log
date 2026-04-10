@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/button';
+import { Button } from '@/components/ui/Button';
 import { ExerciseCard } from '@/components/ui/exercise-card';
 import { ExerciseListSkeleton } from '@/components/feedback/ListSkeletons';
 import { ExerciseSearchFilter } from '@/components/forms/ExerciseSearchFilter';

@@ -16,15 +16,16 @@ export async function GET(request: Request): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const pagination = paginationSchema.safeParse({
     page: searchParams.get('page') ?? '1',
-    pageSize: searchParams.get('pageSize') ?? '20',
+    limit: searchParams.get('limit') ?? '20',
   });
 
   const page = pagination.success ? pagination.data.page : 1;
-  const pageSize = pagination.success ? pagination.data.pageSize : 20;
+  const limit = pagination.success ? pagination.data.limit : 20;
   const search = searchParams.get('search')?.trim() ?? '';
   const category = searchParams.get('category') ?? '';
 
   const where: Record<string, unknown> = {
+    deletedAt: null,
     OR: [
       { isSystemExercise: true },
       { isSystemExercise: false, createdById: session.user.id },
@@ -39,12 +40,12 @@ export async function GET(request: Request): Promise<NextResponse> {
     where.category = category;
   }
 
-  const [exercises, totalItems] = await Promise.all([
+  const [exercises, total] = await Promise.all([
     prisma.exercise.findMany({
       where,
       orderBy: [{ isSystemExercise: 'desc' }, { name: 'asc' }],
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      skip: (page - 1) * limit,
+      take: limit,
       select: {
         id: true,
         name: true,
@@ -63,9 +64,11 @@ export async function GET(request: Request): Promise<NextResponse> {
     data: exercises,
     pagination: {
       page,
-      pageSize,
-      totalItems,
-      totalPages: Math.ceil(totalItems / pageSize),
+      limit,
+      total,
+      totalPages: Math.ceil(total / limit),
+      hasNext: page < Math.ceil(total / limit),
+      hasPrev: page > 1,
     },
   });
 }
