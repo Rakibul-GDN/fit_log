@@ -381,6 +381,163 @@ The following areas will be redesigned using shadcn blocks:
 - ✅ All 120 tests pass
 - ✅ Build passes with 0 errors
 
+## UI Improvements: Sidebar Simplification
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: Sidebar had unnecessary collapsible groups with only 1-2 items each
+**Impact**: Cleaner, flatter navigation experience
+
+### Changes Applied
+
+1. ✅ Removed collapsible group structure (Overview, Planning, Tracking, Account)
+2. ✅ Converted to flat menu items: Dashboard, Routines, Exercises, Workout History, Progress, Settings
+3. ✅ Removed ChevronRight/ChevronDown icons and expand/collapse state management
+4. ✅ Simplified AppSidebar component from 209 lines to ~100 lines
+
+### Files Changed
+
+- `src/components/layout/AppSidebar.tsx` — Flattened navigation structure
+
+### Success Criteria
+
+- ✅ Build passes with 0 errors
+- ✅ All 120 tests pass
+- ✅ Sidebar displays menu items directly without grouping
+
+## UX Improvement: Inline Exercise Creation in RoutineForm
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: Users had to navigate away to `/exercises/create` to add a custom exercise while creating a routine
+**Impact**: Smoother workflow — users can create and use exercises without leaving the routine form
+
+### Changes Applied
+
+1. ✅ Added "New Exercise" button in RoutineForm exercise assignment section
+2. ✅ Created `CreateExerciseDialog` component with inline form (name, category, muscles, description)
+3. ✅ On creation, exercise is added to dropdown and auto-selected for immediate use
+4. ✅ Uses shadcn Dialog with proper loading states and error handling
+
+### Files Changed
+
+- `src/components/forms/RoutineForm.tsx` — Added inline exercise creation dialog
+
+### Success Criteria
+
+- ✅ Build passes with 0 errors
+- ✅ All 120 tests pass
+- ✅ Users can create exercises without leaving the routine form
+- ✅ Newly created exercise appears in dropdown and is auto-selected
+
+## UX Improvement: Editable Targets & Per-Set Logging
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: Routine targets were not editable per assignment, and workout log didn't distinguish between targets vs actuals per set
+**Impact**: Better workout tracking — users see targets and enter actual performance per set
+
+### Changes Applied
+
+1. ✅ **RoutineForm**: Added inline editable targets (sets × reps @ weight) per exercise assignment with edit/save/cancel controls
+2. ✅ **WorkoutLogForm**: Shows targets as reference badge, allows per-set entry of reps and weight
+3. ✅ **Schema**: Changed `weight Float` to `weightPerSet Float[]` in LogEntry to support per-set weight tracking
+4. ✅ **API routes**: Updated all workout/progress/quick-log routes to use `weightPerSet` array
+5. ✅ **Progress tracking**: Volume calculation updated to sum per-set weight × reps
+
+### Files Changed
+
+- `src/components/forms/RoutineForm.tsx` — Added `EditableAssignmentTargets` component
+- `src/components/forms/WorkoutLogForm.tsx` — Complete rewrite with per-set logging UI
+- `prisma/schema.prisma` — Changed `weight` to `weightPerSet Float[]`
+- `src/lib/api/validators.ts` — Updated schema
+- `src/types/entities.ts`, `src/types/forms.ts` — Updated types
+- `src/app/api/workouts/*`, `src/app/api/progress/*`, `src/app/api/routines/*/quick-log/*` — Updated handlers
+- `src/hooks/api/useWorkouts.ts`, `useProgress.ts` — Updated type definitions
+- `tests/contract/*` — Updated test data
+
+### Success Criteria
+
+- ✅ Build passes with 0 errors
+- ✅ All 120 tests pass
+- ✅ Users can edit target sets/reps/weight per assignment in routine form
+- ✅ Workout log shows targets as reference and allows per-set reps/weight entry
+- ✅ Progress charts calculate volume correctly from per-set data
+
+## UX Improvement: Routine Edit Page
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: No way to edit an existing routine after creation
+**Impact**: Users can now modify routines without recreating them
+
+### Changes Applied
+1. ✅ Added Edit button on routine detail page
+2. ✅ Created `/routines/[routineId]/edit` page with pre-filled RoutineForm
+3. ✅ Uses `useUpdateRoutine` mutation (PATCH API)
+4. ✅ Redirects back to routine detail on save
+
+### Files Changed
+- `src/app/(dashboard)/routines/[routineId]/page.tsx` — Added Edit button
+- `src/app/(dashboard)/routines/[routineId]/edit/page.tsx` — New edit page
+
+## UX Improvement: Redirect to Routine Detail After Creation
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: After creating a routine, redirected to routine list instead of the new routine
+**Impact**: Smoother flow — users land directly on the new routine where they can Quick Log
+
+### Changes Applied
+1. ✅ Create routine page now extracts `routineId` from mutation result
+2. ✅ Redirects to `/routines/${routineId}` instead of `/routines`
+
+### Files Changed
+- `src/app/(dashboard)/routines/create/page.tsx` — Updated redirect logic
+
+## Bug Fix: Exercise Dropdown Limited to 20 Items
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: Exercise dropdown in routine form only showed first 20 exercises
+**Impact**: All exercises now visible (pagination max increased to 200)
+
+### Changes Applied
+1. ✅ `paginationSchema` max limit increased from 50 to 200
+2. ✅ Create routine page requests `limit=100` to load all exercises
+
+### Files Changed
+- `src/lib/api/validators.ts` — `max(50)` → `max(200)`
+
+## Bug Fix: Category Always Saved as Barbell in Exercise Dialog
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: Category dropdown in CreateExerciseDialog always saved "BARBELL" regardless of selection
+**Impact**: Correct category now saved when creating exercises inline
+
+### Changes Applied
+1. ✅ Replaced `register('category').onChange(...)` with `setValue('category', v)`
+2. ✅ Properly typed category value with `EXERCISE_CATEGORIES[number]`
+3. ✅ Resets category to BARBELL on dialog close/reopen
+
+### Files Changed
+- `src/components/forms/RoutineForm.tsx` — Fixed category form binding
+
+## Bug Fix: Nested Forms Causing Unexpected Redirects
+
+**Date**: 2026-04-10
+**Status**: ✅ **COMPLETED**
+**Issue**: Creating an exercise inline inside RoutineForm triggered parent form submission, redirecting away
+**Impact**: Users can now create exercises without being kicked out of the routine form
+
+### Changes Applied
+1. ✅ Moved `<CreateExerciseDialog>` outside the parent `<form>` element
+2. ✅ Dialog renders as sibling to form, not nested inside
+
+### Files Changed
+- `src/components/forms/RoutineForm.tsx` — Restructured component tree
+
 ## Complexity Tracking
 
 > **Fill ONLY if Constitution Check has violations that must be justified**

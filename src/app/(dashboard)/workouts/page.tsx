@@ -1,15 +1,32 @@
 'use client';
 
 import { Button } from '@/components/ui/Button';
-import { useWorkouts } from '@/hooks/api/useWorkouts';
+import { useWorkouts, useDeleteWorkout } from '@/hooks/api/useWorkouts';
 import { WorkoutListSkeleton } from '@/components/feedback/ListSkeletons';
 import { WorkoutHistoryCard } from '@/components/layout/WorkoutHistoryCard';
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';
+import { useToast } from '@/hooks/ui/useToast';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export default function WorkoutsPage(): React.ReactElement {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useWorkouts(page, 20);
+  const { data, isLoading, error, refetch } = useWorkouts(page, 20);
+  const deleteMutation = useDeleteWorkout();
+  const toast = useToast();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
+
+  const handleDelete = useCallback(async (): Promise<void> => {
+    if (!deleteId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteId);
+      setDeleteId(null);
+      toast.success('Workout deleted successfully.');
+      void refetch();
+    } catch {
+      toast.error('Failed to delete workout.');
+    }
+  }, [deleteId, deleteMutation, refetch, toast]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -39,7 +56,7 @@ export default function WorkoutsPage(): React.ReactElement {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data?.data?.map((workout) => (
-          <WorkoutHistoryCard key={workout.id} dayOfWeek={workout.dayOfWeek as string} exerciseCount={(workout as { logEntries?: unknown[] }).logEntries?.length ?? 0} id={workout.id} routineName={null} workoutDate={workout.workoutDate as unknown as string} />
+          <WorkoutHistoryCard key={workout.id} dayOfWeek={workout.dayOfWeek as string} exerciseCount={(workout as { logEntries?: unknown[] }).logEntries?.length ?? 0} id={workout.id} routineName={null} workoutDate={workout.workoutDate as unknown as string} onDelete={() => setDeleteId(workout.id)} />
         ))}
       </div>
 
@@ -50,6 +67,16 @@ export default function WorkoutsPage(): React.ReactElement {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => { if (!open) setDeleteId(null); }}
+        onConfirm={handleDelete}
+        title="Delete Workout"
+        description="Are you sure you want to delete this workout? This action cannot be undone."
+        confirmLabel="Delete"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

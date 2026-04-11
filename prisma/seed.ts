@@ -65,7 +65,7 @@ async function main(): Promise<void> {
 
   for (const exercise of defaultExercises) {
     await prisma.exercise.upsert({
-      where: { name_createdById: { name: exercise.name, createdById: SYSTEM_USER_ID } },
+      where: { name_category_createdById: { name: exercise.name, category: exercise.category, createdById: SYSTEM_USER_ID } },
       update: {},
       create: {
         name: exercise.name,

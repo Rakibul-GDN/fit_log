@@ -63,8 +63,8 @@ export async function GET(
     exerciseId: a.exerciseId,
     exerciseName: a.exercise.name,
     setsCompleted: a.defaultSets,
-    repsPerSet: Array(a.defaultReps).fill(a.defaultReps) as number[],
-    weight: a.defaultWeight,
+    repsPerSet: Array(a.defaultSets).fill(a.defaultReps) as number[],
+    weightPerSet: Array(a.defaultSets).fill(a.defaultWeight),
     notes: null as string | null,
   }));
 

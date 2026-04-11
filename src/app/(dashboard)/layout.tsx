@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { AppSidebar } from '@/components/layout/AppSidebar';
+import { usePageTitle } from '@/components/layout/PageTitleContext';
 import { Button } from '@/components/ui/Button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
@@ -92,14 +93,27 @@ export default function DashboardRouteLayout({
   children: React.ReactNode;
 }): React.ReactElement {
   const pathname = usePathname();
+  const { title: contextTitle, setTitle: setContextTitle } = usePageTitle();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   // Determine page meta from pathname
-  const pageMeta = PAGE_META[pathname] ?? {
-    title: pathname.split('/').pop() ?? 'Dashboard',
+  const exactMatch = PAGE_META[pathname];
+  const pageMeta = exactMatch ?? {
+    title: contextTitle || (
+      pathname.startsWith('/routines/') && pathname.split('/').length > 3
+        ? 'Routine Detail'
+        : pathname.startsWith('/workouts/') && pathname.split('/').length > 3
+          ? 'Workout Detail'
+          : pathname.split('/').pop() ?? 'Dashboard'
+    ),
     breadcrumb: ['Dashboard', pathname.split('/')[1] ?? ''],
   };
+
+  // Clear context title when pathname changes (for static routes)
+  useEffect(() => {
+    if (exactMatch) setContextTitle('');
+  }, [pathname, exactMatch, setContextTitle]);
 
   const handleSignOut = async (): Promise<void> => {
     await signOut({ callbackUrl: '/login' });

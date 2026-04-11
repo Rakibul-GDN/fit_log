@@ -3,18 +3,30 @@
 import { Button } from '@/components/ui/Button';
 import { RoutineCard } from '@/components/ui/routine-card';
 import { RoutineListSkeleton } from '@/components/feedback/ListSkeletons';
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';
 import { useRoutines, useDeleteRoutine } from '@/hooks/api/useRoutines';
+import { useToast } from '@/hooks/ui/useToast';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 
 export default function RoutinesPage(): React.ReactElement {
   const [page, setPage] = useState(1);
-  const { data, isLoading, error } = useRoutines(page, 20);
+  const { data, isLoading, error, refetch } = useRoutines(page, 20);
   const deleteMutation = useDeleteRoutine();
+  const toast = useToast();
+  const [deleteId, setDeleteId] = useState<string | null>(null);
 
-  const handleDelete = async (id: string): Promise<void> => {
-    if (confirm('Are you sure you want to delete this routine?')) await deleteMutation.mutateAsync(id);
-  };
+  const handleDelete = useCallback(async (): Promise<void> => {
+    if (!deleteId) return;
+    try {
+      await deleteMutation.mutateAsync(deleteId);
+      setDeleteId(null);
+      toast.success('Routine deleted successfully.');
+      void refetch();
+    } catch {
+      toast.error('Failed to delete routine.');
+    }
+  }, [deleteId, deleteMutation, refetch, toast]);
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -45,7 +57,7 @@ export default function RoutinesPage(): React.ReactElement {
           const routineWithAssignments = routine as { exerciseAssignments?: { exerciseId: string; dayOfWeek: string }[] };
           const exerciseCount = routineWithAssignments.exerciseAssignments?.length ?? 0;
           return (
-            <RoutineCard key={routine.id} description={routine.description ?? null} exerciseCount={exerciseCount} id={routine.id} name={routine.name} onDelete={() => void handleDelete(routine.id)} />
+            <RoutineCard key={routine.id} description={routine.description ?? null} exerciseCount={exerciseCount} id={routine.id} name={routine.name} onDelete={() => setDeleteId(routine.id)} />
           );
         })}
       </div>
@@ -57,6 +69,16 @@ export default function RoutinesPage(): React.ReactElement {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={!!deleteId}
+        onOpenChange={(open) => { if (!open) setDeleteId(null); }}
+        onConfirm={handleDelete}
+        title="Delete Routine"
+        description="Are you sure you want to delete this routine? This action cannot be undone."
+        confirmLabel="Delete"
+        loading={deleteMutation.isPending}
+      />
     </div>
   );
 }

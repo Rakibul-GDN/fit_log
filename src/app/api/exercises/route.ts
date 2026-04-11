@@ -102,16 +102,33 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { name, description, category, primaryMuscles } = validation.data;
 
-  const exercise = await prisma.exercise.create({
-    data: {
-      name,
-      description: description ?? null,
-      category,
-      primaryMuscles,
-      isSystemExercise: false,
-      createdById: session.user.id,
-    },
-  });
+  try {
+    const exercise = await prisma.exercise.create({
+      data: {
+        name,
+        description: description ?? null,
+        category,
+        primaryMuscles,
+        isSystemExercise: false,
+        createdById: session.user.id,
+      },
+    });
 
-  return NextResponse.json({ success: true, data: exercise }, { status: 201 });
+    return NextResponse.json({ success: true, data: exercise }, { status: 201 });
+  } catch (err: unknown) {
+    // Prisma unique constraint violation (P2002)
+    if (err instanceof Error && 'code' in err && err.code === 'P2002') {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'CONFLICT',
+            message: `An exercise named "${name}" already exists in the ${category.replace(/_/g, ' ').toLowerCase()} category.`,
+          },
+        },
+        { status: 409 },
+      );
+    }
+    throw err;
+  }
 }

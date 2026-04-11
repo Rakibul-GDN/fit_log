@@ -71,7 +71,7 @@ export default function ProgressPage(): React.ReactElement {
                 {ex.changePercent > 0 ? '+' : ''}{ex.changePercent}%
               </span>
             </div>
-            <ProgressChart title="" data={ex.dataPoints.map((dp) => ({ workoutDate: dp.workoutDate, weight: dp.weight, volume: dp.volume }))} />
+            <ProgressChart title="" data={ex.dataPoints.map((dp) => ({ workoutDate: dp.workoutDate, weightPerSet: dp.weightPerSet, volume: dp.volume }))} />
           </div>
         ))}
       </div>

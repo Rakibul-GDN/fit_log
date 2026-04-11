@@ -130,7 +130,7 @@ model Exercise {
   exerciseAssignments ExerciseAssignment[]
   logEntries         LogEntry[]
 
-  @@unique([name, createdById])
+  @@unique([name, category, createdById])
   @@index([isSystemExercise])
   @@index([createdById])
   @@index([deletedAt])
@@ -175,15 +175,16 @@ model LogEntry {
   id             String   @id @default(uuid())
   workoutLogId   String
   exerciseId     String
+  order          Int      @default(0)
   setsCompleted  Int
   repsPerSet     Int[]
-  weight         Float
+  weightPerSet   Float[]
   notes          String?  @db.VarChar(500)
 
   workoutLog WorkoutLog @relation(fields: [workoutLogId], references: [id], onDelete: Cascade)
   exercise   Exercise   @relation(fields: [exerciseId], references: [id], onDelete: Restrict)
 
-  @@index([exerciseId, workoutLogId])
+  @@index([workoutLogId, order])
 }
 
 model BodyMeasurement {

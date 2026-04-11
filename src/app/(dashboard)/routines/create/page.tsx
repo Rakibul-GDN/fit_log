@@ -16,7 +16,12 @@ export default function CreateRoutinePage(): React.ReactElement {
 
   const onSubmit = useCallback(async (data: RoutineFormValues): Promise<void> => {
     setServerError(null);
-    try { await createMutation.mutateAsync(data); router.push('/routines'); }
+    try {
+      const result = await createMutation.mutateAsync(data);
+      const routineId = result.data?.id;
+      if (routineId) router.push(`/routines/${routineId}`);
+      else router.push('/routines');
+    }
     catch (err) { setServerError(err instanceof Error ? err.message : 'Failed to create routine'); }
   }, [createMutation, router]);
 

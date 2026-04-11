@@ -25,7 +25,7 @@ async function fetchWorkout(workoutId: string): Promise<SuccessResponse<WorkoutL
 
 /** Create workout mutation */
 async function createWorkout(
-  input: { dayOfWeek: string; workoutDate: string; notes?: string; entries: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weight: number; notes?: string }[] },
+  input: { dayOfWeek: string; workoutDate: string; notes?: string; entries: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weightPerSet: number[]; notes?: string }[] },
 ): Promise<SuccessResponse<WorkoutLog>> {
   const { data } = await apiClient.post<SuccessResponse<WorkoutLog>>('/workouts', input);
   return data;
@@ -34,7 +34,7 @@ async function createWorkout(
 /** Update workout mutation */
 async function updateWorkout(
   workoutId: string,
-  input: { dayOfWeek?: string; workoutDate?: string; notes?: string; entries?: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weight: number; notes?: string }[] },
+  input: { dayOfWeek?: string; workoutDate?: string; notes?: string; entries?: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weightPerSet: number[]; notes?: string }[] },
 ): Promise<SuccessResponse<WorkoutLog>> {
   const { data } = await apiClient.patch<SuccessResponse<WorkoutLog>>(`/workouts/${workoutId}`, input);
   return data;
@@ -81,7 +81,7 @@ export function useUpdateWorkout() {
   const queryClient = useQueryClient();
   const toast = useToast();
   return useMutation({
-    mutationFn: ({ workoutId, input }: { workoutId: string; input: { dayOfWeek?: string; workoutDate?: string; notes?: string; entries?: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weight: number; notes?: string }[] } }) =>
+    mutationFn: ({ workoutId, input }: { workoutId: string; input: { dayOfWeek?: string; workoutDate?: string; notes?: string; entries?: { exerciseId: string; setsCompleted: number; repsPerSet: number[]; weightPerSet: number[]; notes?: string }[] } }) =>
       updateWorkout(workoutId, input),
     onSuccess: (_, { workoutId }) => {
       void queryClient.invalidateQueries({ queryKey: ['workouts'] });

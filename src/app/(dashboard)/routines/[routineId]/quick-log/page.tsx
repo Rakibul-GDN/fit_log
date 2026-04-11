@@ -6,7 +6,7 @@ import { useCallback, useEffect, useState } from 'react';
 
 const DAYS = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'] as const;
 
-interface LogEntry { id: string; exerciseId: string; exerciseName: string; setsCompleted: number; repsPerSet: number[]; weight: number; notes: string }
+interface LogEntry { id: string; exerciseId: string; exerciseName: string; setsCompleted: number; repsPerSet: number[]; weightPerSet: number[]; notes: string }
 
 export default function QuickLogPage(): React.ReactElement {
   const params = useParams();
@@ -33,7 +33,7 @@ export default function QuickLogPage(): React.ReactElement {
     try {
       const res = await fetch(`/api/routines/${routineId}/quick-log`, {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ dayOfWeek: selectedDay, workoutDate: new Date().toISOString(), entries: entries.map((e) => ({ exerciseId: e.exerciseId, setsCompleted: e.setsCompleted, repsPerSet: e.repsPerSet, weight: e.weight, notes: e.notes || null })) }),
+        body: JSON.stringify({ dayOfWeek: selectedDay, workoutDate: new Date().toISOString(), entries: entries.map((e) => ({ exerciseId: e.exerciseId, setsCompleted: e.setsCompleted, repsPerSet: e.repsPerSet, weightPerSet: e.weightPerSet, notes: e.notes || null })) }),
       });
       if (!res.ok) throw new Error('Failed to save workout');
       router.push('/workouts');

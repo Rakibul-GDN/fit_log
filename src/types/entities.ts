@@ -58,7 +58,7 @@ export interface LogEntry {
   exerciseId: string;
   setsCompleted: number;
   repsPerSet: number[];
-  weight: number;
+  weightPerSet: number[];
   notes: string | null;
 }
 

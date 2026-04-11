@@ -29,8 +29,8 @@ export default function DashboardPage(): React.ReactElement {
     }).length;
     const avgVolume = totalWorkouts > 0
       ? Math.round(workouts.reduce((sum, w) => {
-          const entries = (w as { logEntries?: Array<{ weight: number; repsPerSet: number[]; setsCompleted: number }> }).logEntries ?? [];
-          return sum + entries.reduce((e, entry) => e + entry.weight * entry.repsPerSet.reduce((r, v) => r + v, 0), 0);
+          const entries = (w as { logEntries?: Array<{ weightPerSet: number[]; repsPerSet: number[]; setsCompleted: number }> }).logEntries ?? [];
+          return sum + entries.reduce((e, entry) => e + entry.weightPerSet.reduce((ws: number, w: number, idx: number) => ws + w * (entry.repsPerSet[idx] || 0), 0), 0);
         }, 0) / Math.max(workouts.length, 1))
       : 0;
     const activeRoutines = routines.length;
@@ -45,7 +45,7 @@ export default function DashboardPage(): React.ReactElement {
 
   // Map real workouts to table rows
   const workoutRows = workouts.map((w) => {
-    const entries = (w as { logEntries?: Array<{ weight: number; repsPerSet: number[]; setsCompleted: number }> }).logEntries ?? [];
+    const entries = (w as { logEntries?: Array<{ weightPerSet: number[]; repsPerSet: number[]; setsCompleted: number }> }).logEntries ?? [];
     return {
       id: w.id,
       date: w.workoutDate,

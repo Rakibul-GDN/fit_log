@@ -22,8 +22,8 @@ export async function GET(
     where: { id: workoutId, userId: session.user.id },
     include: {
       logEntries: {
+        orderBy: { order: 'asc' },
         include: { exercise: { select: { id: true, name: true, category: true } } },
-        orderBy: { id: 'asc' },
       },
     },
   });
@@ -110,7 +110,7 @@ export async function PATCH(
             exerciseId: e.exerciseId,
             setsCompleted: e.setsCompleted,
             repsPerSet: e.repsPerSet,
-            weight: e.weight,
+            weightPerSet: e.weightPerSet,
             notes: e.notes ?? null,
           })),
         });

@@ -13,7 +13,7 @@ export interface ExerciseProgress {
     exerciseId: string;
     exerciseName: string;
     workoutDate: string;
-    weight: number;
+    weightPerSet: number[];
     volume: number;
     setsCompleted: number;
     repsPerSet: number[];

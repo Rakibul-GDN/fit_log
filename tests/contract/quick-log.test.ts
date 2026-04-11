@@ -11,7 +11,7 @@ describe('Quick Log API Contract Tests', () => {
     exerciseId: z.string(),
     setsCompleted: z.number(),
     repsPerSet: z.array(z.number()),
-    weight: z.number(),
+    weightPerSet: z.array(z.number()),
     notes: z.string().nullable(),
   });
 
@@ -44,7 +44,7 @@ describe('Quick Log API Contract Tests', () => {
               exerciseId: 'ex-1',
               setsCompleted: 3,
               repsPerSet: [10, 10, 10],
-              weight: 60,
+              weightPerSet: [60, 60, 60],
               notes: null,
             },
           ],

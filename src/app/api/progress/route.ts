@@ -54,7 +54,7 @@ export async function GET(request: Request): Promise<NextResponse> {
         exerciseId: string;
         exerciseName: string;
         workoutDate: Date;
-        weight: number;
+        weightPerSet: number[];
         volume: number;
         setsCompleted: number;
         repsPerSet: number[];
@@ -74,13 +74,16 @@ export async function GET(request: Request): Promise<NextResponse> {
       }
       const group = exerciseMap.get(key);
       if (!group) continue;
-      const volume = entry.setsCompleted * entry.repsPerSet.reduce((a: number, b: number) => a + b, 0);
+      const volume = entry.weightPerSet.reduce(
+        (sum: number, w: number, idx: number) => sum + w * (entry.repsPerSet[idx] || 0),
+        0,
+      );
       group.dataPoints.push({
         id: entry.id,
         exerciseId: entry.exerciseId,
         exerciseName: entry.exercise.name,
         workoutDate: workout.workoutDate,
-        weight: entry.weight,
+        weightPerSet: entry.weightPerSet,
         volume,
         setsCompleted: entry.setsCompleted,
         repsPerSet: entry.repsPerSet,
@@ -93,8 +96,8 @@ export async function GET(request: Request): Promise<NextResponse> {
     const sorted = group.dataPoints.sort(
       (a, b) => new Date(a.workoutDate).getTime() - new Date(b.workoutDate).getTime(),
     );
-    const startWeight = sorted[0]?.weight ?? 0;
-    const currentWeight = sorted[sorted.length - 1]?.weight ?? 0;
+    const startWeight = sorted[0]?.weightPerSet.reduce((s: number, w: number) => s + w, 0) ?? 0;
+    const currentWeight = sorted[sorted.length - 1]?.weightPerSet.reduce((s: number, w: number) => s + w, 0) ?? 0;
     const changePercent =
       startWeight > 0 ? Math.round(((currentWeight - startWeight) / startWeight) * 10000) / 100 : 0;
 

@@ -10,10 +10,7 @@ import {
   Dumbbell,
   BarChart3,
   Settings,
-  ChevronRight,
-  ChevronDown,
 } from 'lucide-react';
-import { useState } from 'react';
 
 // ── Icon map ───────────────────────────────────────────────────────
 const ICONS: Record<string, ReactNode> = {
@@ -31,44 +28,13 @@ interface NavItem {
   iconKey: string;
 }
 
-interface NavGroup {
-  title: string;
-  iconKey: string;
-  items: NavItem[];
-  defaultOpen?: boolean;
-}
-
-const NAV_GROUPS: NavGroup[] = [
-  {
-    title: 'Overview',
-    iconKey: 'dashboard',
-    items: [{ label: 'Dashboard', href: '/', iconKey: 'dashboard' }],
-    defaultOpen: true,
-  },
-  {
-    title: 'Planning',
-    iconKey: 'routines',
-    items: [
-      { label: 'Routines', href: '/routines', iconKey: 'routines' },
-      { label: 'Exercises', href: '/exercises', iconKey: 'exercises' },
-    ],
-    defaultOpen: true,
-  },
-  {
-    title: 'Tracking',
-    iconKey: 'workouts',
-    items: [
-      { label: 'Workout History', href: '/workouts', iconKey: 'workouts' },
-      { label: 'Progress', href: '/progress', iconKey: 'progress' },
-    ],
-    defaultOpen: true,
-  },
-  {
-    title: 'Account',
-    iconKey: 'settings',
-    items: [{ label: 'Settings', href: '/settings', iconKey: 'settings' }],
-    defaultOpen: false,
-  },
+const NAV_ITEMS: NavItem[] = [
+  { label: 'Dashboard', href: '/', iconKey: 'dashboard' },
+  { label: 'Routines', href: '/routines', iconKey: 'routines' },
+  { label: 'Exercises', href: '/exercises', iconKey: 'exercises' },
+  { label: 'Workout History', href: '/workouts', iconKey: 'workouts' },
+  { label: 'Progress', href: '/progress', iconKey: 'progress' },
+  { label: 'Settings', href: '/settings', iconKey: 'settings' },
 ];
 
 interface AppSidebarProps {
@@ -77,22 +43,9 @@ interface AppSidebarProps {
   variant?: 'sidebar' | 'mobile';
 }
 
-/** Modern shadcn/ui-style sidebar with collapsible sections */
+/** Modern shadcn/ui-style sidebar with flat menu items */
 export function AppSidebar({ collapsed = false, onClose, variant = 'sidebar' }: AppSidebarProps): ReactNode {
   const pathname = usePathname();
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    () => {
-      const initial: Record<string, boolean> = {};
-      NAV_GROUPS.forEach((group) => {
-        initial[group.title] = group.defaultOpen ?? false;
-      });
-      return initial;
-    }
-  );
-
-  const toggleGroup = (title: string): void => {
-    setExpandedGroups((prev) => ({ ...prev, [title]: !prev[title] }));
-  };
 
   const isActive = (href: string): boolean => {
     if (href === '/') return pathname === '/';
@@ -121,84 +74,25 @@ export function AppSidebar({ collapsed = false, onClose, variant = 'sidebar' }: 
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto p-3">
-        <div className="space-y-2">
-          {NAV_GROUPS.map((group) => {
-            const isGroupActive = group.items.some((item) => isActive(item.href));
-            const isExpanded = expandedGroups[group.title] ?? false;
-
-            if (collapsed) {
-              // Collapsed state: show icons only
-              return (
-                <div key={group.title} className="space-y-1">
-                  {group.items.map((item) => {
-                    const active = isActive(item.href);
-                    return (
-                      <Link
-                        key={item.href}
-                        href={item.href}
-                        className={cn(
-                          'flex h-9 w-9 items-center justify-center rounded-md transition-colors',
-                          active
-                            ? 'bg-primary text-primary-foreground shadow-sm'
-                            : 'text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                        )}
-                        onClick={onClose}
-                        title={item.label}
-                      >
-                        {ICONS[item.iconKey]}
-                      </Link>
-                    );
-                  })}
-                </div>
-              );
-            }
-
-            // Expanded state: show collapsible groups
+        <div className="space-y-1">
+          {NAV_ITEMS.map((item) => {
+            const active = isActive(item.href);
             return (
-              <div key={group.title} className="space-y-1">
-                <button
-                  type="button"
-                  className={cn(
-                    'flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-xs font-medium transition-colors',
-                    isGroupActive
-                      ? 'text-sidebar-foreground'
-                      : 'text-sidebar-muted hover:text-sidebar-foreground'
-                  )}
-                  onClick={() => toggleGroup(group.title)}
-                >
-                  {ICONS[group.iconKey]}
-                  <span className="flex-1 text-left uppercase tracking-wider">{group.title}</span>
-                  {isExpanded ? (
-                    <ChevronDown className="h-3 w-3" />
-                  ) : (
-                    <ChevronRight className="h-3 w-3" />
-                  )}
-                </button>
-
-                {isExpanded && (
-                  <div className="ml-2 space-y-1">
-                    {group.items.map((item) => {
-                      const active = isActive(item.href);
-                      return (
-                        <Link
-                          key={item.href}
-                          href={item.href}
-                          className={cn(
-                            'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors',
-                            active
-                              ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
-                              : 'text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
-                          )}
-                          onClick={onClose}
-                        >
-                          {ICONS[item.iconKey]}
-                          <span>{item.label}</span>
-                        </Link>
-                      );
-                    })}
-                  </div>
+              <Link
+                key={item.href}
+                href={item.href}
+                className={cn(
+                  'flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm transition-colors',
+                  collapsed && 'justify-center px-0',
+                  active
+                    ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+                    : 'text-sidebar-muted hover:bg-sidebar-accent hover:text-sidebar-accent-foreground'
                 )}
-              </div>
+                onClick={onClose}
+              >
+                {ICONS[item.iconKey]}
+                {!collapsed && <span>{item.label}</span>}
+              </Link>
             );
           })}
         </div>

@@ -14,7 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/Card';
 
 interface DataPoint {
   workoutDate: string;
-  weight: number;
+  weightPerSet: number[];
   volume: number;
 }
 
@@ -41,7 +41,7 @@ export function ProgressChart({ title, data, emptyMessage = 'No progress data ye
   const chartData = data
     .map((d) => ({
       date: new Date(d.workoutDate).toLocaleDateString(),
-      weight: d.weight,
+      weight: d.weightPerSet.reduce((s: number, w: number) => s + w, 0),
       volume: d.volume,
     }))
     .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());

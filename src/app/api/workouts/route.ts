@@ -40,6 +40,7 @@ export async function GET(request: Request): Promise<NextResponse> {
       take: limit,
       include: {
         logEntries: {
+          orderBy: { order: 'asc' },
           include: { exercise: { select: { id: true, name: true } } },
         },
       },
@@ -90,28 +91,66 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { dayOfWeek, workoutDate, notes, entries } = validation.data;
 
-  const workout = await prisma.workoutLog.create({
-    data: {
+  // Normalize workoutDate to start of day for comparison
+  const startOfDay = new Date(workoutDate);
+  startOfDay.setHours(0, 0, 0, 0);
+  const endOfDay = new Date(workoutDate);
+  endOfDay.setHours(23, 59, 59, 999);
+
+  // Check if a workout log already exists for this date
+  const existingLog = await prisma.workoutLog.findFirst({
+    where: {
       userId: session.user.id,
-      dayOfWeek: dayOfWeek as never,
-      workoutDate,
-      notes: notes ?? null,
-      logEntries: {
-        create: entries.map((e) => ({
-          exerciseId: e.exerciseId,
-          setsCompleted: e.setsCompleted,
-          repsPerSet: e.repsPerSet,
-          weight: e.weight,
-          notes: e.notes ?? null,
-        })),
-      },
-    },
-    include: {
-      logEntries: {
-        include: { exercise: { select: { id: true, name: true, category: true } } },
+      workoutDate: {
+        gte: startOfDay,
+        lte: endOfDay,
       },
     },
   });
 
-  return NextResponse.json({ success: true, data: workout }, { status: 201 });
+  const entryData = entries.map((e, i) => ({
+    exerciseId: e.exerciseId,
+    order: i,
+    setsCompleted: e.setsCompleted,
+    repsPerSet: e.repsPerSet,
+    weightPerSet: e.weightPerSet,
+    notes: e.notes ?? null,
+  }));
+
+  let workout;
+
+  if (existingLog) {
+    // Append entries to existing log
+    workout = await prisma.workoutLog.update({
+      where: { id: existingLog.id },
+      data: {
+        dayOfWeek: dayOfWeek as never,
+        ...(notes && { notes }),
+        logEntries: { create: entryData },
+      },
+      include: {
+        logEntries: {
+          include: { exercise: { select: { id: true, name: true, category: true } } },
+        },
+      },
+    });
+  } else {
+    // Create new workout log
+    workout = await prisma.workoutLog.create({
+      data: {
+        userId: session.user.id,
+        dayOfWeek: dayOfWeek as never,
+        workoutDate,
+        notes: notes ?? null,
+        logEntries: { create: entryData },
+      },
+      include: {
+        logEntries: {
+          include: { exercise: { select: { id: true, name: true, category: true } } },
+        },
+      },
+    });
+  }
+
+  return NextResponse.json({ success: true, data: workout }, { status: existingLog ? 200 : 201 });
 }

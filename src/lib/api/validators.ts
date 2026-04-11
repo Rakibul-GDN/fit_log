@@ -3,7 +3,7 @@ import { z } from 'zod';
 /** Pagination query parameters */
 export const paginationSchema = z.object({
   page: z.coerce.number().int().positive().default(1),
-  limit: z.coerce.number().int().min(1).max(50).default(10),
+  limit: z.coerce.number().int().min(1).max(200).default(10),
 });
 
 /** Registration request body */
@@ -98,7 +98,7 @@ export const workoutLogSchema = z.object({
         exerciseId: z.uuid(),
         setsCompleted: z.number().int().min(1).max(100),
         repsPerSet: z.array(z.number().int().min(1).max(500)),
-        weight: z.number().min(0),
+        weightPerSet: z.array(z.number().min(0)),
         notes: z.string().max(500).optional(),
       }),
     )
