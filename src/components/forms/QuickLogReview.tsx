@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
 import { useExercises } from '@/hooks/api/useExercises';
@@ -32,10 +32,6 @@ export function QuickLogReview({ entries: initialEntries, dayOfWeek, onSave, onD
   const [isSaving, setIsSaving] = useState(false);
   const router = useRouter();
   const { data: exercisesData } = useExercises(1, 100);
-
-  const updateEntry = (index: number, field: keyof LogEntry, value: unknown): void => {
-    setEntries((prev) => { const u = [...prev]; u[index] = { ...u[index], [field]: value }; return u; });
-  };
 
   const removeEntry = (index: number): void => setEntries((p) => p.filter((_, i) => i !== index));
 

@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { RoutineCard } from '@/components/ui/routine-card';
 import { RoutineListSkeleton } from '@/components/feedback/ListSkeletons';
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';

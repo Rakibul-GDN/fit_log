@@ -1,6 +1,6 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { RoutineWeekView } from '@/components/layout/RoutineWeekView';
 import { useRoutine, useDeleteRoutine } from '@/hooks/api/useRoutines';
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';

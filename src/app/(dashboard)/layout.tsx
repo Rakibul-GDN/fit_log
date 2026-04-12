@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import { AppSidebar } from '@/components/layout/AppSidebar';
 import { usePageTitle } from '@/components/layout/PageTitleContext';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   DropdownMenu,
@@ -21,7 +21,6 @@ import {
   PanelLeftClose,
   PanelLeftOpen,
   LogOut,
-  Settings,
   User,
 } from 'lucide-react';
 import Link from 'next/link';

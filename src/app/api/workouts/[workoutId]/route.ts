@@ -86,7 +86,7 @@ export async function PATCH(
   // Update workout with partial data
   const workout = await prisma.$transaction(async (tx) => {
     // Update basic fields
-    const updated = await tx.workoutLog.update({
+    await tx.workoutLog.update({
       where: { id: workoutId },
       data: {
         ...(dayOfWeek && { dayOfWeek: dayOfWeek as never }),

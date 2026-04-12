@@ -72,7 +72,7 @@ export async function POST(
         { status: 400 },
       );
     }
-    logEntriesData = routine.exerciseAssignments.map((a, i) => ({
+    logEntriesData = routine.exerciseAssignments.map((a) => ({
       exerciseId: a.exerciseId,
       order: a.order,
       setsCompleted: a.defaultSets,

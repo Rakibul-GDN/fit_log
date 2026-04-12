@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { AuthCard } from '@/components/layout/AuthCard';
 import Link from 'next/link';
 import { useCallback, useState } from 'react';

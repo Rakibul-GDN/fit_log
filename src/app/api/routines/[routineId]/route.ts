@@ -87,7 +87,7 @@ export async function PATCH(
   // Update routine with partial data
   const routine = await prisma.$transaction(async (tx) => {
     // Update basic fields
-    const updated = await tx.routine.update({
+    await tx.routine.update({
       where: { id: routineId },
       data: {
         ...(name && { name }),

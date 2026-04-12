@@ -64,18 +64,26 @@ async function main(): Promise<void> {
   const SYSTEM_USER_ID = '00000000-0000-0000-0000-000000000000';
 
   for (const exercise of defaultExercises) {
-    await prisma.exercise.upsert({
-      where: { name_category_createdById: { name: exercise.name, category: exercise.category, createdById: SYSTEM_USER_ID } },
-      update: {},
-      create: {
+    const existing = await prisma.exercise.findFirst({
+      where: {
         name: exercise.name,
         category: exercise.category,
-        primaryMuscles: exercise.primaryMuscles,
-        isSystemExercise: true,
-        description: exercise.description ?? null,
         createdById: SYSTEM_USER_ID,
       },
     });
+
+    if (!existing) {
+      await prisma.exercise.create({
+        data: {
+          name: exercise.name,
+          category: exercise.category,
+          primaryMuscles: exercise.primaryMuscles,
+          isSystemExercise: true,
+          description: exercise.description ?? null,
+          createdById: SYSTEM_USER_ID,
+        },
+      });
+    }
   }
 
   const count = await prisma.exercise.count({ where: { isSystemExercise: true } });

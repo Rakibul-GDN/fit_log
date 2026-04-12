@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
-import { Modal } from '@/components/ui/Modal';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Modal } from '@/components/ui/modal';
 import { SettingsForm } from '@/components/forms/SettingsForm';
 import { useSettings, useUpdateSettings } from '@/hooks/api/useSettings';
 import { signOut } from 'next-auth/react';

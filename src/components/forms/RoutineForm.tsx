@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
@@ -107,7 +107,7 @@ function CreateExerciseDialog({
         setOpen(false);
         setServerError(null);
       }
-    } catch (err) {
+    } catch {
       setServerError('An unexpected error occurred.');
     } finally {
       setIsCreating(false);
@@ -328,9 +328,7 @@ export function RoutineForm({ defaultValues, exercises = [], onExercisesChange, 
   };
 
   return (
-    <>
-      <CreateExerciseDialog onExerciseCreated={handleExerciseCreated} />
-      <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
+    <form className="space-y-6" onSubmit={handleSubmit(onSubmit)}>
       <Input label="Routine Name" {...register('name')} />
       {errors.name && <p className="mt-1 text-sm text-destructive">{errors.name.message}</p>}
       <Input label="Description (optional)" {...register('description')} />
@@ -439,10 +437,11 @@ export function RoutineForm({ defaultValues, exercises = [], onExercisesChange, 
         </div>
       </div>
 
+      <CreateExerciseDialog onExerciseCreated={handleExerciseCreated} />
+
       <Button className="w-full" disabled={isSubmitting} type="submit">
         {isSubmitting ? 'Saving...' : (defaultValues ? 'Update Routine' : 'Create Routine')}
       </Button>
     </form>
-    </>
   );
 }

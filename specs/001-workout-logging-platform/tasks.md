@@ -527,3 +527,9 @@ With multiple developers:
 | T163 | ✅ Complete | HeroUI Tailwind theme configured — proper colors, spacing, shadows on all components |
 | T164 | ✅ Complete | Email verification enforced — unverified users cannot log in |
 | T165 | ✅ Complete | Email send failures surfaced — user sees warning if verification email fails |
+
+### UI/UX Improvements (tracked)
+
+| Task | Status | Description |
+|------|--------|-------------|
+| T172 | ⏳ Pending | Move "New Exercise" button to bottom of RoutineForm, before "Create Routine" button — improves form flow and visibility |

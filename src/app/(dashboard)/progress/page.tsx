@@ -1,8 +1,8 @@
 'use client';
 
 import { useState } from 'react';
-import { Button } from '@/components/ui/Button';
-import { Card, CardContent } from '@/components/ui/Card';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
 import { ProgressChart } from '@/components/charts/ProgressChart';
 import { ProgressSkeleton } from '@/components/feedback/ListSkeletons';
 import { BodyMeasurementForm, type BodyMeasurementFormValues } from '@/components/forms/BodyMeasurementForm';

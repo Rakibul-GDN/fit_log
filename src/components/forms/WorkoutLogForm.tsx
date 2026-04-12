@@ -1,7 +1,7 @@
 'use client';
 
-import { Button } from '@/components/ui/Button';
-import { Input } from '@/components/ui/Input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   Select,
@@ -153,7 +153,6 @@ export function WorkoutLogForm({ defaultEntries = [], defaultDayOfWeek = 'MONDAY
           <Button type="button" size="sm" onClick={addExercise}>+ Add Exercise</Button>
         </div>
         {entries.map((entry, i) => {
-          const exercise = exercises.find((e) => e.id === entry.exerciseId);
           return (
             <div key={i} className="rounded-lg border bg-card p-4">
               <div className="mb-3 flex items-start gap-2">

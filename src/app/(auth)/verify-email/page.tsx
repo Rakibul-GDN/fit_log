@@ -3,7 +3,7 @@
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useCallback, useEffect, useState } from 'react';
 import { LoadingSpinner } from '@/components/feedback/LoadingSpinner';
-import { Button } from '@/components/ui/Button';
+import { Button } from '@/components/ui/button';
 
 export default function VerifyEmailPage(): React.ReactElement {
   return (<Suspense fallback={<div className="flex min-h-screen items-center justify-center"><LoadingSpinner /></div>}><VerifyEmailContent /></Suspense>);
