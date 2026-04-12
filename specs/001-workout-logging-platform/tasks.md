@@ -544,3 +544,4 @@ With multiple developers:
 | T176 | ⏭️ Skipped | Reused existing create form pattern in edit page — no separate form component needed |
 | T177 | ✅ Complete | Added edit page `/exercises/[exerciseId]/edit` with full form, data fetching, and update mutation |
 | T178 | ✅ Complete | Added delete confirmation dialog using ConfirmDialog component with loading state |
+| T179 | ✅ Complete | Fixed edit page `setValueAs` type error — handle both string input and array values for primaryMuscles field |

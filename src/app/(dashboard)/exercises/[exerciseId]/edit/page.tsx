@@ -120,7 +120,7 @@ export default function EditExercisePage(): React.ReactElement {
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium">Primary Muscles (comma-separated)</label>
-          <input className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" {...register('primaryMuscles', { setValueAs: (v: string) => v.split(',').map((s) => s.trim()) })} />
+          <input className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm" {...register('primaryMuscles', { setValueAs: (v: unknown) => typeof v === 'string' ? v.split(',').map((s) => s.trim()) : v })} />
           {errors.primaryMuscles && <p className="text-sm text-destructive">{errors.primaryMuscles.message}</p>}
         </div>
         <div className="flex gap-3">
