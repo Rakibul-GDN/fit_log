@@ -532,4 +532,15 @@ With multiple developers:
 
 | Task | Status | Description |
 |------|--------|-------------|
-| T172 | ⏳ Pending | Move "New Exercise" button to bottom of RoutineForm, before "Create Routine" button — improves form flow and visibility |
+| T172 | ✅ Complete | Move "New Exercise" button to bottom of RoutineForm, before "Create Routine" button — improves form flow and visibility |
+
+### Exercise Management (US4 Enhancement)
+
+| Task | Status | Description |
+|------|--------|-------------|
+| T173 | ✅ Complete | Added PATCH `/api/exercises/[exerciseId]` route handler — users can update their own custom exercises (name, description, category, primaryMuscles) |
+| T174 | ✅ Complete | Added `useUpdateExercise` and `useDeleteExercise` React Query hooks in `src/hooks/api/useExercises.ts` |
+| T175 | ✅ Complete | Updated ExerciseCard component to show Edit/Delete dropdown menu for user-created exercises only |
+| T176 | ⏭️ Skipped | Reused existing create form pattern in edit page — no separate form component needed |
+| T177 | ✅ Complete | Added edit page `/exercises/[exerciseId]/edit` with full form, data fetching, and update mutation |
+| T178 | ✅ Complete | Added delete confirmation dialog using ConfirmDialog component with loading state |

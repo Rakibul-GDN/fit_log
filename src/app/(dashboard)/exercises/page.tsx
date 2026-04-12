@@ -4,15 +4,30 @@ import { Button } from '@/components/ui/button';
 import { ExerciseCard } from '@/components/ui/exercise-card';
 import { ExerciseListSkeleton } from '@/components/feedback/ListSkeletons';
 import { ExerciseSearchFilter } from '@/components/forms/ExerciseSearchFilter';
-import { useExercises } from '@/hooks/api/useExercises';
+import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';
+import { useExercises, useDeleteExercise } from '@/hooks/api/useExercises';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function ExercisesPage(): React.ReactElement {
+  const router = useRouter();
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState('');
+  const [exerciseToDelete, setExerciseToDelete] = useState<{ id: string; name: string } | null>(null);
   const { data, isLoading, error } = useExercises(page, 20, search || undefined, category || undefined);
+  const deleteExercise = useDeleteExercise();
+
+  const handleEdit = (exerciseId: string): void => {
+    router.push(`/exercises/${exerciseId}/edit`);
+  };
+
+  const confirmDelete = async (): Promise<void> => {
+    if (!exerciseToDelete) return;
+    await deleteExercise.mutateAsync(exerciseToDelete.id);
+    setExerciseToDelete(null);
+  };
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-8">
@@ -42,7 +57,16 @@ export default function ExercisesPage(): React.ReactElement {
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {data?.data?.map((exercise) => (
-          <ExerciseCard key={exercise.id} category={exercise.category as string} description={exercise.description} isSystemExercise={exercise.isSystemExercise} name={exercise.name} primaryMuscles={exercise.primaryMuscles} />
+          <ExerciseCard
+            key={exercise.id}
+            category={exercise.category as string}
+            description={exercise.description}
+            isSystemExercise={exercise.isSystemExercise}
+            name={exercise.name}
+            primaryMuscles={exercise.primaryMuscles}
+            onEdit={exercise.isSystemExercise ? undefined : () => handleEdit(exercise.id)}
+            onDelete={exercise.isSystemExercise ? undefined : () => setExerciseToDelete({ id: exercise.id, name: exercise.name })}
+          />
         ))}
       </div>
 
@@ -53,6 +77,17 @@ export default function ExercisesPage(): React.ReactElement {
           ))}
         </div>
       )}
+
+      <ConfirmDialog
+        open={exerciseToDelete !== null}
+        onOpenChange={(open) => { if (!open) setExerciseToDelete(null); }}
+        title="Delete Exercise"
+        description={`Are you sure you want to delete "${exerciseToDelete?.name}"? This action cannot be undone.`}
+        confirmLabel="Delete"
+        variant="destructive"
+        onConfirm={() => void confirmDelete()}
+        loading={deleteExercise.isPending}
+      />
     </div>
   );
 }
