@@ -5,3 +5,6 @@ build/
 coverage/
 package-lock.json
 *.min.js
+out/
+*.log
+.env*

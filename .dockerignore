@@ -1,0 +1,9 @@
+# Ignore test outputs, build artifacts, and environment files
+node_modules/
+dist/
+build/
+coverage/
+.next/
+out/
+*.log
+.env*

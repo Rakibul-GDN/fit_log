@@ -77,6 +77,13 @@ _GATE: Must pass before Phase 0 research. Re-check after Phase 1 design._
 
 **Gate Status (Post-Design)**: ALL GATES PASS — No violations. Proceed to task generation.
 
+## Implementation Note: Routine Name Uniqueness (Bugfix)
+
+- **Issue**: Users were unable to create a routine with a name that exists for any user, not just themselves. The API returned a 409 ROUTINE_NAME_EXISTS error even if the routine name was unique for the current user.
+- **Root Cause**: The error handler for the POST /api/routines endpoint did not check which unique constraint was violated, so any P2002 error triggered the name-exists response.
+- **Fix**: The error handler now checks that the unique constraint violated is specifically the `[userId, name]` constraint before returning the ROUTINE_NAME_EXISTS error. This ensures only routines with the same name for the same user are blocked.
+- **Tracking**: See src/app/api/routines/route.ts (POST handler) for the updated logic.
+
 ## Project Structure
 
 ### Documentation (this feature)

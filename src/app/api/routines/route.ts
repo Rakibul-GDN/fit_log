@@ -167,7 +167,8 @@ export async function POST(request: Request): Promise<NextResponse> {
       typeof error === 'object' &&
       error !== null &&
       'code' in error &&
-      (error as { code: string }).code === 'P2002'
+      (error as { code: string }).code === 'P2002' &&
+      (error as any).meta?.target?.includes('userId_name')
     ) {
       return NextResponse.json(
         {

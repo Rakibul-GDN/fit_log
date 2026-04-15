@@ -8,7 +8,7 @@ import { useWorkout, useDeleteWorkout, useUpdateWorkout } from '@/hooks/api/useW
 import { ConfirmDialog } from '@/components/feedback/ConfirmDialog';
 import { useToast } from '@/hooks/ui/useToast';
 import { useParams, useRouter } from 'next/navigation';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Pencil, X, Check, Plus, GripVertical, ArrowUp, ArrowDown } from 'lucide-react';
 
 export default function WorkoutDetailPage(): React.ReactElement {
@@ -38,7 +38,11 @@ export default function WorkoutDetailPage(): React.ReactElement {
 
   const workout = data?.data;
   const initialEntries = (workout as { logEntries?: LogEntry[] })?.logEntries ?? [];
+
   const [entries, setEntries] = useState<LogEntry[]>(initialEntries);
+  useEffect(() => {
+    setEntries(initialEntries);
+  }, [initialEntries]);
 
   if (isLoading) return <div className="mx-auto max-w-7xl px-4 py-8 text-muted-foreground">Loading workout...</div>;
   if (error) return <div className="mx-auto max-w-7xl px-4 py-8 text-destructive">Failed to load workout.</div>;
