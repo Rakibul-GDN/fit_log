@@ -545,3 +545,5 @@ With multiple developers:
 | T177 | ✅ Complete | Added edit page `/exercises/[exerciseId]/edit` with full form, data fetching, and update mutation |
 | T178 | ✅ Complete | Added delete confirmation dialog using ConfirmDialog component with loading state |
 | T179 | ✅ Complete | Fixed edit page `setValueAs` type error — handle both string input and array values for primaryMuscles field |
+| T180 | ✅ Complete | Fixed routine creation duplicate name error — catches Prisma `P2002` unique constraint violation and returns `409 CONFLICT` with user-friendly `ROUTINE_NAME_EXISTS` error |
+| T181 | ✅ Complete | Fixed soft-deleted routines blocking re-creation — POST now checks for soft-deleted duplicates and restores them with new assignments instead of failing on unique constraint |

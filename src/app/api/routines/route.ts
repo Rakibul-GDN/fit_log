@@ -88,28 +88,103 @@ export async function POST(request: Request): Promise<NextResponse> {
 
   const { name, description, assignments } = validation.data;
 
-  const routine = await prisma.routine.create({
-    data: {
-      userId: session.user.id,
-      name,
-      description: description ?? null,
-      exerciseAssignments: {
-        create: assignments.map((a) => ({
-          exerciseId: a.exerciseId,
-          dayOfWeek: a.dayOfWeek,
-          defaultSets: a.defaultSets,
-          defaultReps: a.defaultReps,
-          defaultWeight: a.defaultWeight,
-          order: a.order,
-        })),
-      },
-    },
-    include: {
-      exerciseAssignments: {
-        include: { exercise: { select: { id: true, name: true, category: true } } },
-      },
-    },
-  });
+  try {
+    // First, check for a soft-deleted routine with the same name — restore it if found
+    const softDeleted = await prisma.routine.findFirst({
+      where: { userId: session.user.id, name, deletedAt: { not: null } },
+    });
 
-  return NextResponse.json({ success: true, data: routine }, { status: 201 });
+    if (softDeleted) {
+      // Restore the soft-deleted routine by clearing deletedAt and updating assignments
+      await prisma.$transaction([
+        // Delete old exercise assignments for the restored routine
+        prisma.exerciseAssignment.deleteMany({
+          where: { routineId: softDeleted.id },
+        }),
+        // Restore the routine
+        prisma.routine.update({
+          where: { id: softDeleted.id },
+          data: {
+            deletedAt: null,
+            description: description ?? softDeleted.description,
+            exerciseAssignments: {
+              create: assignments.map((a) => ({
+                exerciseId: a.exerciseId,
+                dayOfWeek: a.dayOfWeek,
+                defaultSets: a.defaultSets,
+                defaultReps: a.defaultReps,
+                defaultWeight: a.defaultWeight,
+                order: a.order,
+              })),
+            },
+          },
+          include: {
+            exerciseAssignments: {
+              include: { exercise: { select: { id: true, name: true, category: true } } },
+            },
+          },
+        }),
+      ]);
+
+      const restored = await prisma.routine.findUnique({
+        where: { id: softDeleted.id },
+        include: {
+          exerciseAssignments: {
+            include: { exercise: { select: { id: true, name: true, category: true } } },
+          },
+        },
+      });
+
+      return NextResponse.json({ success: true, data: restored }, { status: 201 });
+    }
+
+    const routine = await prisma.routine.create({
+      data: {
+        userId: session.user.id,
+        name,
+        description: description ?? null,
+        exerciseAssignments: {
+          create: assignments.map((a) => ({
+            exerciseId: a.exerciseId,
+            dayOfWeek: a.dayOfWeek,
+            defaultSets: a.defaultSets,
+            defaultReps: a.defaultReps,
+            defaultWeight: a.defaultWeight,
+            order: a.order,
+          })),
+        },
+      },
+      include: {
+        exerciseAssignments: {
+          include: { exercise: { select: { id: true, name: true, category: true } } },
+        },
+      },
+    });
+
+    return NextResponse.json({ success: true, data: routine }, { status: 201 });
+  } catch (error: unknown) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'code' in error &&
+      (error as { code: string }).code === 'P2002'
+    ) {
+      return NextResponse.json(
+        {
+          success: false,
+          error: {
+            code: 'ROUTINE_NAME_EXISTS',
+            message: 'A routine with this name already exists. Please choose a different name.',
+          },
+        },
+        { status: 409 },
+      );
+    }
+
+    console.error('[POST /api/routines] Error:', error);
+    return NextResponse.json(
+      { success: false, error: { code: 'INTERNAL_ERROR', message: 'Failed to create routine.' } },
+      { status: 500 },
+    );
+  }
 }
